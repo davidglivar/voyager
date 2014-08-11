@@ -1,0 +1,41 @@
+{
+  "name": "voyager",
+  "version": "0.0.0",
+  "description": "",
+  "main": "voyager.js",
+  "bin": {
+    "voyager": "bin/voyager.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^5.9.1",
+    "colors": "^0.6.2",
+    "commander": "^2.3.0",
+    "del": "^0.1.1",
+    "ecstatic": "^0.5.4",
+    "es6-promise": "^1.0.0",
+    "graceful-fs": "^3.0.2",
+    "gulp": "^3.8.7",
+    "gulp-autoprefixer": "0.0.8",
+    "gulp-cache": "^0.2.0",
+    "gulp-csso": "^0.2.9",
+    "gulp-imagemin": "^0.6.2",
+    "gulp-jshint": "^1.8.4",
+    "gulp-plumber": "^0.6.4",
+    "gulp-stylus": "^1.3.0",
+    "gulp-uglify": "^0.3.1",
+    "gulp-util": "^3.0.0",
+    "gulp.spritesmith": "^1.1.1",
+    "jshint-stylish": "^0.4.0",
+    "mkdirp": "^0.5.0",
+    "pinwheel": "0.0.1",
+    "read": "^1.0.5",
+    "require-dir": "^0.1.0",
+    "vinyl-fs": "^0.3.6",
+    "vinyl-source-stream": "^0.1.1"
+  }
+}

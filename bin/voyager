@@ -31,6 +31,7 @@ function buildSkeleton(errors) {
   mkdirp.sync(join(dir, 'images'));
 
   Promise.all([
+      // items that live in /src/
       new Promise(function (resolve, reject) {
         vfs.src([
             join(__dirname, '../support/index.html')
@@ -42,6 +43,7 @@ function buildSkeleton(errors) {
           .on('error', reject)
           .on('end', resolve);
       })
+      // items that live in root (/)
     , new Promise(function (resolve, reject) {
         vfs.src([
             join(__dirname, '../support/.jshintrc')
@@ -50,15 +52,31 @@ function buildSkeleton(errors) {
           .on('error', reject)
           .on('end', resolve);
       })
+      // javascripts
     , new Promise(function (resolve, reject) {
-        vfs.src(join(__dirname, '../support/main.js'))
+        vfs.src(join(__dirname, '../support/javascripts/main.js'))
           .pipe(vfs.dest(CWD + '/src/javascripts'))
           .on('error', reject)
           .on('end', resolve);
       })
+      // style entry
     , new Promise(function (resolve, reject) {
-        vfs.src(join(__dirname, '../support/main.styl'))
+        vfs.src(join(__dirname, '../support/stylesheets/main.styl'))
           .pipe(vfs.dest(CWD + '/src/stylesheets'))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+      // style src
+    , new Promise(function (resolve, reject) {
+        vfs.src(join(__dirname, '../support/stylesheets/src/**/*.styl'))
+          .pipe(vfs.dest(CWD + '/src/stylesheets/src'))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+      // images
+    , new Promise(function (resolve, reject) {
+        vfs.src(join(__dirname, '../support/images/**'))
+          .pipe(vfs.dest(CWD + '/src/images'))
           .on('error', reject)
           .on('end', resolve);
       })

@@ -11,6 +11,7 @@ voyager.task('start', function (done) {
   this.run('clean')
     .then(this.run.bind(this, 'artifacts'))
     .then(this.run.bind(this, 'html'))
+    .then(this.run.bind(this, 'images'))
     .then(this.run.bind(this, 'scripts'))
     .then(this.run.bind(this, 'styles'))
     .then(function () {

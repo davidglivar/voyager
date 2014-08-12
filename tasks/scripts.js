@@ -8,7 +8,7 @@ var voyager = require('../voyager')
 
 voyager.task('scripts:browserify', function (done) {
   browserify({ debug: true })
-    .require(require.resolve(CWD + '/src/javascripts/main.js', { entry: true }))
+    .add(CWD + '/src/javascripts/main.js')
     .bundle()
     .pipe(vss('main.js'))
     .pipe(vfs.dest(CWD + '/.dev/javascripts'))

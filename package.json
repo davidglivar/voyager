@@ -4,7 +4,7 @@
   "description": "",
   "main": "voyager.js",
   "bin": {
-    "voyager": "bin/voyager.js"
+    "voyager": "bin/voyager"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

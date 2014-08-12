@@ -9,6 +9,7 @@ var voyager = require('../voyager')
   , Promise = require('es6-promise').Promise
   , read = require('read')
   , reqd = require('require-dir')
+  , vfs = require('vinyl-fs')
 
   , join = path.join
   , project = {}
@@ -28,9 +29,43 @@ function buildSkeleton(errors) {
   mkdirp.sync(join(dir, 'javascripts/vendor'));
   mkdirp.sync(join(dir, 'stylesheets/vendor'));
   mkdirp.sync(join(dir, 'images'));
-  fs.writeFileSync(join(dir, 'javascripts/main.js'), '');
-  fs.writeFileSync(join(dir, 'stylesheets/main.styl'), '');
-  fs.writeFileSync(join(dir, 'index.html'), '');
+
+  Promise.all([
+      new Promise(function (resolve, reject) {
+        vfs.src([
+            join(__dirname, '../support/index.html')
+          , join(__dirname, '../support/apple-touch-icon-precomposed.png')
+          , join(__dirname, '../support/favicon.ico')
+          , join(__dirname, '../support/*.txt')
+          ])
+          .pipe(vfs.dest(CWD + '/src'))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+    , new Promise(function (resolve, reject) {
+        vfs.src([
+            join(__dirname, '../support/.jshintrc')
+          ])
+          .pipe(vfs.dest(CWD))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+    , new Promise(function (resolve, reject) {
+        vfs.src(join(__dirname, '../support/main.js'))
+          .pipe(vfs.dest(CWD + '/src/javascripts'))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+    , new Promise(function (resolve, reject) {
+        vfs.src(join(__dirname, '../support/main.styl'))
+          .pipe(vfs.dest(CWD + '/src/stylesheets'))
+          .on('error', reject)
+          .on('end', resolve);
+      })
+    ])
+    .then(function () {
+      console.log('\n\ndone!'.green);
+    });
 }
 
 function readConfim() {

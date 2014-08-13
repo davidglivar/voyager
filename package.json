@@ -1,6 +1,6 @@
 {
   "name": "voyager",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A static site generator from the edge of the solar system.",
   "main": "voyager.js",
   "bin": {
@@ -13,7 +13,7 @@
   "license": "ISC",
   "repository": { 
     "type": "git",
-    "url": "https://github.com/davidglivar/voyager.git" 
+    "url": "git@github.com:davidglivar/voyager.git"
   },
   "dependencies": {
     "browserify": "^5.9.1",

@@ -6,6 +6,27 @@ Installation
 ------------
 
     $ npm install -g voyager
+
+What?
+-----
+
+Voyager is a static site generator and task runner.
+
+Why?
+----
+
+There are many static site generators out there, many are awesome:
+[wintersmith](http://wintersmith.io/), [blacksmith](http://blacksmith.jit.su/),
+and Google's [web starter kit](https://developers.google.com/web/starter-kit/)
+to name a few. In fact, this project was created and inspired by the above 
+projects, along with the [gulp](http://gulpjs.com/) build system. The
+[web starter kit](https://developers.google.com/web/starter-kit/) was the
+closest tool to what I needed, but it lacked in one key area: I wanted a 
+generator. [Gulp](http://gulpjs.com/) completely changed my workflow for the
+better, but it was tricky to integrate it outside of the `gulp` CLI.
+
+How?
+----
 	
 Commands
 --------

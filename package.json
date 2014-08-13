@@ -13,7 +13,7 @@
   "license": "ISC",
   "repository": { 
     "type": "git",
-    "url": "https://github.com/davidglivar/voyager.git" 
+    "url": "git@github.com:davidglivar/voyager.git"
   },
   "dependencies": {
     "browserify": "^5.9.1",

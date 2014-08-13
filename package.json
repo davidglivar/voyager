@@ -23,7 +23,6 @@
     "ecstatic": "^0.5.4",
     "es6-promise": "^1.0.0",
     "graceful-fs": "^3.0.2",
-    "gulp": "^3.8.7",
     "gulp-autoprefixer": "0.0.8",
     "gulp-cache": "^0.2.0",
     "gulp-csso": "^0.2.9",

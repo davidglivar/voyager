@@ -224,27 +224,27 @@ function init() {
 cmd.version(PKG.version);
 
 cmd.command('build')
-  .description('')
+  .description('Build a production ready version of you site')
   .action(voyager.run.bind(voyager, 'build'));
 
 cmd.command('clean')
-  .description('')
+  .description('Destroy .dev and build directories')
   .action(voyager.run.bind(voyager, 'clean'));
 
 cmd.command('init')
-  .description('')
+  .description('Create a new voyager project in an empty directory')
   .action(init);
 
 cmd.command('start')
   .alias('s')
-  .description('')
+  .description('Start the local static server and watch files for changes')
   .action(voyager.run.bind(voyager, 'start'));
 
-cmd.command('task <tsk>')
+cmd.command('task <taskname>')
   .alias('t')
-  .description('')
-  .action(function (tsk) {
-    voyager.run(tsk);
+  .description('Run a specific task, including custom defined tasks')
+  .action(function (taskname) {
+    voyager.run(taskname);
   });
 
 cmd.parse(process.argv);

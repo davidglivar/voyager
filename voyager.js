@@ -1,8 +1,21 @@
+/**
+ * @file voyager.js Exported methods for voyager in a node environment.
+ * @module {Object} voyager
+ */
+
+/**
+ * Module dependencies
+ */
 var Pinwheel = require('pinwheel')({ mark: '⚡' })
   , Promise = require('es6-promise').Promise;
-
 require('colors');
 
+/**
+ * Helper function to extend defaults
+ * @private
+ * @param {Object} original - The object to be augmented
+ * @returns {Object}
+ */
 function extend(original) {
   var sources = Array.prototype.slice.call(arguments, 1);
   sources.forEach(function (src) {
@@ -16,7 +29,24 @@ function extend(original) {
 }
 
 module.exports = {
-  _tasks: []
+
+  /**
+   * Namespace for registered tasks
+   * @member {Object}
+   * @private
+   */
+  _tasks: {}
+
+  /**
+   * Registers a task in the _tasks namespace. Tasks are automatically wrapped
+   * in a Promise for chained execution.
+   * @method
+   * @public
+   * @param {string} key - The name under which this task will be registered
+   * @param {Function} func - The task definition
+   * @param {Object} [options={}] - Options for this task
+   * @returns {Promise}
+   */
 , task: function (key, func, options) {
     options = extend({
       spin: true
@@ -58,6 +88,13 @@ module.exports = {
       });
     };
   }
+
+  /**
+   * Run a registered task
+   * @method
+   * @public
+   * @param {string} task - The task to run
+   */
 , run: function (task) {
     return this._tasks[task].call(this);
   }

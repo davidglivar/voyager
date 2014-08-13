@@ -27,6 +27,16 @@ better, but it was tricky to integrate it outside of the `gulp` CLI.
 
 How?
 ----
+
+Underneath Gulp is the powerful package [vinyl-fs](https://github.com/wearefractal/vinyl-fs). Methods like `src`, `dest`, and `watch` are basically just moved into
+the gulp namespace. If you isolate vinyl-fs, you can use it outside of gulp, and
+– most importantly – can still seamlessly use your favorite
+[gulp plugins](http://gulpjs.com/plugins/). This allowed for familiar tasks to
+be written while not inventing a new plugin architecture entirely.
+
+Tasks in voyager are run in sequence, as opposed to parallel. Common/opinionated
+tasks are available for use by default; however, you may create new tasks, or
+even overwrite existing tasks for your own use.
 	
 Commands
 --------
@@ -105,3 +115,8 @@ Tasks are automatically wrapped in a Promise, so you can chain calls.
       .then(function () {
         console.log('done!');
       });
+
+License
+-------
+
+ISC, see the LICENSE file for details.

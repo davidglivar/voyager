@@ -16,7 +16,6 @@
     "url": "git@github.com:davidglivar/voyager.git"
   },
   "dependencies": {
-    "browserify": "^5.9.1",
     "colors": "^0.6.2",
     "commander": "^2.3.0",
     "es6-promise": "^1.0.0",

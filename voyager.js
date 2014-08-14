@@ -6,37 +6,23 @@
 /**
  * Module dependencies
  */
-var Pinwheel = require('pinwheel')({ mark: '⚡' })
-  , Promise = require('es6-promise').Promise;
-require('colors');
+var colors = require('colors')
+  , Pinwheel = require('pinwheel')({ mark: '⚡' })
+  , Promise = require('es6-promise').Promise
 
-/**
- * Helper function to extend defaults
- * @private
- * @param {Object} original - The object to be augmented
- * @returns {Object}
- */
-function extend(original) {
-  var sources = Array.prototype.slice.call(arguments, 1);
-  sources.forEach(function (src) {
-    for (var key in src) {
-      if (src.hasOwnProperty(key)) {
-        original[key] = src[key];
-      }
-    }
-  });
-  return original;
-}
+  , defaults = {
+      spin: false
+    };
 
-module.exports = {
-
+var voyager = Object.defineProperties({}, {
   /**
    * Namespace for registered tasks
    * @member {Object}
    * @private
    */
-  _tasks: {}
-
+  tasks_: {
+    value: {}
+  }
   /**
    * Registers a task in the _tasks namespace. Tasks are automatically wrapped
    * in a Promise for chained execution.
@@ -44,49 +30,55 @@ module.exports = {
    * @public
    * @param {string} key - The name under which this task will be registered
    * @param {Function} func - The task definition
-   * @param {Object} [options={}] - Options for this task
+   * @param {Object} [opts={}] - Options for this task
    * @returns {Promise}
    */
-, task: function (key, func, options) {
-    options = extend({
-      spin: true
-    }, options || {});
-
-    var self = this;
-
-    this._tasks[key] = function () {
-      var start = Date.now()
-        , wheel;
-
-      if (options.spin) {
-        wheel = new Pinwheel('TASK: ' + key);
-        wheel.start();
-      } else {
-        console.log('starting ' + key.grey + '...');
-      }
-
-      return new Promise(function (resolve, reject) {
-        func.call(self, function (err) {
-          if (err) return reject(err);
-          return resolve();
-        });
-      }).then(function () {
-        if (wheel) return wheel.stop();
-        return console.log(
-          'finished ' + key.green + ' ' + ((Date.now() - start) + 'ms').grey
-        );
-      })['catch'](function (err) {
-        if (wheel) {
-          wheel.stop();
-        } else {
-          console.log(
-            'ERROR'.inverse.red + ' ' + key.red + ' ' 
-          + ((Date.now() - start) + 'ms').grey
-          );
+, task: {
+    value: function (id, func, opts) {
+      opts = opts || {};
+      var options = {}
+        , key
+        , start = Date.now()
+        , wheel = new Pinwheel('TASK: ' + id);
+      // extend default options
+      for (key in defaults) {
+        var v = defaults[key];
+        if (opts.hasOwnProperty(key)) {
+          v = opts[key];
         }
-        return console.error(err);
-      });
-    };
+        options[key] = v;
+      }
+      // register the task
+      this.tasks_[id] = function () {
+        if (options.spin) {
+          wheel.start();
+        } else {
+          console.log('starting ' + id.grey + '...');
+        }
+        var args = Array.prototype.slice.call(arguments);
+        return new Promise(function (resolve, reject) {
+          func.call(voyager, function (err) {
+            if (err) return reject(err);
+            return resolve();
+          }, args);
+        }).then(function () {
+          if (options.spin) return wheel.stop();
+          return console.log(
+            'finished ' + id.green + ' ' + ((Date.now() - start) + 'ms').grey
+          );
+        })['catch'](function (err) {
+          if (options.spin) {
+            wheel.stop(err);
+          } else {
+            console.log(
+              'ERROR'.inverse.red + ' ' + id.red + ' ' 
+            + ((Date.now() - start) + 'ms').grey
+            );
+          }
+          return console.error(err);
+        });
+      };
+    }
   }
 
   /**
@@ -95,7 +87,12 @@ module.exports = {
    * @public
    * @param {string} task - The task to run
    */
-, run: function (task) {
-    return this._tasks[task].call(this);
+, run: {
+    value: function (id) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return this.tasks_[id].call(this, args);
+    }  
   }
-};
+});
+
+module.exports = voyager;

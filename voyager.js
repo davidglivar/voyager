@@ -12,6 +12,7 @@ var colors = require('colors')
 
   , defaults = {
       spin: false
+    , namespaces: []
     };
 
 var voyager = Object.defineProperties({}, {
@@ -21,6 +22,9 @@ var voyager = Object.defineProperties({}, {
    * @private
    */
   tasks_: {
+    value: {}
+  }
+, namespaces_: {
     value: {}
   }
 , CWD: {
@@ -43,8 +47,14 @@ var voyager = Object.defineProperties({}, {
    * @returns {Promise}
    */
 , task: {
-    value: function (id, func, opts) {
-      opts = opts || {};
+    value: function (id, ns, func, opts) {
+      if (typeof ns === 'function') {
+        opts = func || {};
+        func = ns;
+        ns = 'ns';
+      } else {
+        opts = opts || {};
+      }
       var options = {}
         , key
         , start = Date.now()
@@ -56,6 +66,16 @@ var voyager = Object.defineProperties({}, {
           v = opts[key];
         }
         options[key] = v;
+      }
+      // store task id in given namespace
+      if (Array.isArray(ns)) {
+        for (var i = 0, l = ns.length; i < l; i++) {
+          if (!this.namespaces_[ns[i]]) this.namespaces_[ns[i]] = [];
+          this.namespaces_[ns[i]].push(id);
+        }
+      } else {
+        if (!this.namespaces_[ns]) this.namespaces_[ns] = [];
+        this.namespaces_[ns].push(id);
       }
       // register the task
       this.tasks_[id] = function () {
@@ -98,8 +118,63 @@ var voyager = Object.defineProperties({}, {
    */
 , run: {
     value: function (id) {
-      var args = Array.prototype.slice.call(arguments, 1);
-      return this.tasks_[id].call(this, args);
+      var args = Array.prototype.slice.call(arguments, 1)
+        , tasks = [];
+      // array of tasks/namespaces
+      if (Array.isArray(id)) {
+        var i = 0
+          , l = id.length;
+        for (i; i < l; i++) {
+          // a task
+          if (typeof this.tasks_[id[i]] === 'function') {
+            tasks.push(
+              new Promise(function (done, fail) {
+                voyager.tasks_[id[i]].call(voyager, args).then(done);
+              })
+            );
+          // a namespace
+          } else if (id[i] in this.namespaces_) {
+            var j = 0
+              , jl = this.namespaces_[id[i]].length;
+            for (j; j < jl; j++) {
+              var t = this.namespaces_[id[i][j]];
+              if (typeof this.tasks_[t] === 'function') {
+                tasks.push(
+                  new Promise(function (done, fail) {
+                    voyager.tasks_[t].call(voyager, args).then(done);
+                  })
+                );
+              }
+            }
+          }
+        }
+        // run the tasks
+        return Promise.all(tasks);
+      // a singular task/namespace
+      } else {
+        // a task
+        if (typeof this.tasks_[id] === 'function') {
+          return this.tasks_[id].call(this, args);
+        // a namespace
+        } else if (id in this.namespaces_) {
+          var i = 0
+            , l = this.namespaces_[id].length;
+          for (i; i < l; i++) {
+            var t = this.namespaces_[id][i];
+            if (typeof this.tasks_[t] === 'function') {
+              tasks.push(
+                new Promise(function (done, fail) {
+                  voyager.tasks_[t].call(voyager, args).then(done);
+                })
+              );
+            }
+          }
+          // run all tasks
+          return Promise.all(tasks);
+        }
+        // no tasks/namespaces found
+        return false;
+      }
     }  
   }
 });

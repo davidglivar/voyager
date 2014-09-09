@@ -1,22 +1,10 @@
 #!/usr/bin/env node
 
-//var inquirer = require('inquirer');
-
-
-
 var voyager = require('../voyager')
-  , spawn = require('child_process').spawn
   , cmd = require('commander')
   , fs = require('graceful-fs')
-  , mkdirp = require('mkdirp')
-  , path = require('path')
-  , Promise = require('es6-promise').Promise
-  , read = require('read')
+  , join = require('path').join
   , reqd = require('require-dir')
-  , vfs = require('vinyl-fs')
-
-  , join = path.join
-  , project = {}
 
   , CWD = process.cwd()
   , PKG = JSON.parse(fs.readFileSync(join(__dirname, '../package.json'), { encoding: 'utf-8' }));
@@ -25,208 +13,10 @@ var voyager = require('../voyager')
 try { 
   console.warning('Default tasks in voyager have been deprecated. Consider upgrading!');
   reqd('../tasks'); 
-} catch (err) {}
+} catch (err) { console.error(err); }
 
 // Try to load user tasks
-try { reqd(join(CWD, 'tasks')); } catch (err) {}
-
-function buildSkeleton(errors) {
-  var dir = join(CWD, 'src');
-  mkdirp.sync(dir);
-  mkdirp.sync(join(dir, 'javascripts/vendor'));
-  mkdirp.sync(join(dir, 'stylesheets/vendor'));
-  mkdirp.sync(join(dir, 'images'));
-
-  Promise.all([
-      // items that live in /src/
-      new Promise(function (resolve, reject) {
-        vfs.src([
-            join(__dirname, '../support/index.html')
-          , join(__dirname, '../support/apple-touch-icon-precomposed.png')
-          , join(__dirname, '../support/favicon.ico')
-          , join(__dirname, '../support/*.txt')
-          ])
-          .pipe(vfs.dest(CWD + '/src'))
-          .on('error', reject)
-          .on('end', resolve);
-      })
-      // items that live in root (/)
-    , new Promise(function (resolve, reject) {
-        vfs.src([
-            join(__dirname, '../support/.jshintrc')
-          ])
-          .pipe(vfs.dest(CWD))
-          .on('error', reject)
-          .on('end', resolve);
-      })
-      // javascripts
-    , new Promise(function (resolve, reject) {
-        vfs.src(join(__dirname, '../support/javascripts/main.js'))
-          .pipe(vfs.dest(CWD + '/src/javascripts'))
-          .on('error', reject)
-          .on('end', resolve);
-      })
-      // style entry
-    , new Promise(function (resolve, reject) {
-        vfs.src(join(__dirname, '../support/stylesheets/main.styl'))
-          .pipe(vfs.dest(CWD + '/src/stylesheets'))
-          .on('error', reject)
-          .on('end', resolve);
-      })
-      // style src
-    , new Promise(function (resolve, reject) {
-        vfs.src(join(__dirname, '../support/stylesheets/src/**/*.styl'))
-          .pipe(vfs.dest(CWD + '/src/stylesheets/src'))
-          .on('error', reject)
-          .on('end', resolve);
-      })
-      // images
-    , new Promise(function (resolve, reject) {
-        vfs.src(join(__dirname, '../support/images/**'))
-          .pipe(vfs.dest(CWD + '/src/images'))
-          .on('error', reject)
-          .on('end', resolve);
-      })
-    ])
-    .then(function () {
-      console.log('\n\ndone!'.green);
-    });
-}
-
-function readConfim() {
-  if (!project.license) delete project.license;
-  return new Promise(function (resolve, reject) {
-    console.log(project);
-    read({
-      prompt: 'Does this look right?'
-    , default: 'yes'
-    }, function (err, v) {
-      if (err) return reject(err);
-      if (v.match(/^y(es)?$/i)) {
-        v = true;
-      } else {
-        v = false;
-      }
-      return resolve(v);
-    });
-  });
-}
-
-function readDescription() {
-  return new Promise(function (resolve, reject) {
-    read({
-      prompt: 'Description:'
-    , default: 'Static site'
-    }, function (err, v) {
-      if (err) return reject(err);
-      project.description = v.trim();
-      return resolve(v);
-    });
-  });
-}
-
-function readLicense() {
-  return new Promise(function (resolve, reject) {
-    project.license = null;
-    if (project.private) return resolve();
-    read({
-      prompt: 'License:'
-    , default: 'ISC'
-    }, function (err, v) {
-      if (err) return reject(err);
-      project.license = v;
-      return resolve(v);
-    });
-  });
-}
-
-function readName() {
-  return new Promise(function (resolve, reject) {
-    var name = path.basename(CWD);
-    read({
-      prompt: 'Project name:'
-    , default: name
-    }, function (err, v) {
-      if (err) return reject(err);
-      project.name = v;
-      return resolve(v);
-    });
-  });
-}
-
-function readPrivate() {
-  return new Promise(function (resolve, reject) {
-    read({
-      prompt: 'Private?'
-    , default: 'yes'
-    }, function (err, v) {
-      if (err) return reject(err);
-      if (v.match(/^y(es)?$/i)) {
-        v = true;
-      } else {
-        v = false;
-      }
-      project.private = v;
-      return resolve(v);
-    });
-  });
-}
-
-function readVersion() {
-  return new Promise(function (resolve, reject) {
-    read({
-      prompt: 'Version:'
-    , default: '0.0.0'
-    }, function (err, v) {
-      if (err) return reject(err);
-      project.version = v;
-      return resolve(v);
-    });
-  });
-}
-
-function writeJSON() {
-  fs.writeFile(
-    join(CWD, 'package.json')
-  , JSON.stringify(project, null, 2)
-  , function (err) {
-      if (err) throw err;
-      spawn('npm', ['i'], { stdio: 'inherit' })
-        .on('close', function (code) {
-          return buildSkeleton(code !== 0);
-        });
-  });
-}
-
-function writePackage(ok) {
-  if (!ok) return console.log('Exiting.');
-  project.devDependencies = { voyager: '^' + PKG.version };
-  var files = fs.readdirSync(CWD);
-  if (files.length) {
-    read({
-      prompt: 'Directory is not empty, do you want to continue?'
-    , default: 'no'
-    }, function (err, v) {
-      if (err) return reject(err);
-      if (v.match(/^y(es)?$/i)) {
-        return writeJSON();
-      }
-      return console.log('Exiting.');
-    });
-  } else {
-    return writeJSON();
-  }
-}
-
-function init() {
-  readName()
-    .then(readVersion)
-    .then(readDescription)
-    .then(readPrivate)
-    .then(readLicense)
-    .then(readConfim)
-    .then(writePackage);
-}
+try { reqd(join(CWD, 'tasks')); } catch (err) { console.error(err); }
 
 cmd.version(PKG.version);
 
@@ -238,9 +28,9 @@ cmd.command('clean')
   .description('Destroy .dev and build directories')
   .action(voyager.run.bind(voyager, 'clean'));
 
-cmd.command('init')
-  .description('Create a new voyager project in an empty directory')
-  .action(init);
+//cmd.command('init')
+  //.description('Create a new voyager project in an empty directory')
+  //.action(init);
 
 cmd.command('start')
   .alias('s')

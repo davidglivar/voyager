@@ -3,18 +3,14 @@
 var voyager = require('../voyager')
   , cmd = require('commander')
   , fs = require('graceful-fs')
+  , init = require('../lib/cmd.init')
   , join = require('path').join
   , reqd = require('require-dir')
 
   , CWD = process.cwd()
   , PKG = JSON.parse(fs.readFileSync(join(__dirname, '../package.json'), { encoding: 'utf-8' }));
 
-// Try to load deprecated default tasks
-try { 
-  console.warning('Default tasks in voyager have been deprecated. Consider upgrading!');
-  reqd('../tasks'); 
-} catch (err) { console.error(err); }
-
+try { reqd('../lib/tasks'); } catch (err) { console.error(err); }
 // Try to load user tasks
 try { reqd(join(CWD, 'tasks')); } catch (err) { console.error(err); }
 
@@ -28,9 +24,9 @@ cmd.command('clean')
   .description('Destroy .dev and build directories')
   .action(voyager.run.bind(voyager, 'clean'));
 
-//cmd.command('init')
-  //.description('Create a new voyager project in an empty directory')
-  //.action(init);
+cmd.command('init')
+  .description('Create a new voyager project in an empty directory')
+  .action(init);
 
 cmd.command('start')
   .alias('s')

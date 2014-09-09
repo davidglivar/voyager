@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
+    "inquirer": "^0.6.0",
     "mocha": "^1.21.4"
   }
 }

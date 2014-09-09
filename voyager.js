@@ -23,6 +23,15 @@ var voyager = Object.defineProperties({}, {
   tasks_: {
     value: {}
   }
+, CWD: {
+    value: process.cwd()
+  }
+, TMP: {
+    value: this.CWD + '/.dev'
+  }
+, SRC: {
+    value: this.CWD + '/src'
+  }
   /**
    * Registers a task in the _tasks namespace. Tasks are automatically wrapped
    * in a Promise for chained execution.

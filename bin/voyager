@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+//var inquirer = require('inquirer');
+
+
+
 var voyager = require('../voyager')
   , spawn = require('child_process').spawn
   , cmd = require('commander')
@@ -17,8 +21,11 @@ var voyager = require('../voyager')
   , CWD = process.cwd()
   , PKG = JSON.parse(fs.readFileSync(join(__dirname, '../package.json'), { encoding: 'utf-8' }));
 
-// Load default tasks
-reqd('../tasks');
+// Try to load deprecated default tasks
+try { 
+  console.warning('Default tasks in voyager have been deprecated. Consider upgrading!');
+  reqd('../tasks'); 
+} catch (err) {}
 
 // Try to load user tasks
 try { reqd(join(CWD, 'tasks')); } catch (err) {}

@@ -15,6 +15,25 @@ var colors = require('colors')
     , namespaces: []
     };
 
+function addNS(ns, args) {
+  var tasks = []
+    , i = 0
+    , l = voyager.namespaces_[ns].length;
+  for (i; i < l; i++) {
+    var t = voyager.namespaces_[ns][i];
+    if (typeof voyager.tasks_[t] === 'function') {
+      tasks.push(addTask(t, args));
+    }
+  }
+  return tasks;
+}
+
+function addTask(id, args) {
+  new Promise(function (done, fail) {
+    voyager.tasks_[id].call(voyager, args).then(done);
+  });
+}
+
 var voyager = Object.defineProperties({}, {
   /**
    * Namespace for registered tasks
@@ -127,25 +146,10 @@ var voyager = Object.defineProperties({}, {
         for (i; i < l; i++) {
           // a task
           if (typeof this.tasks_[id[i]] === 'function') {
-            tasks.push(
-              new Promise(function (done, fail) {
-                voyager.tasks_[id[i]].call(voyager, args).then(done);
-              })
-            );
+            tasks.push(addTask(id[i], args));
           // a namespace
           } else if (id[i] in this.namespaces_) {
-            var j = 0
-              , jl = this.namespaces_[id[i]].length;
-            for (j; j < jl; j++) {
-              var t = this.namespaces_[id[i][j]];
-              if (typeof this.tasks_[t] === 'function') {
-                tasks.push(
-                  new Promise(function (done, fail) {
-                    voyager.tasks_[t].call(voyager, args).then(done);
-                  })
-                );
-              }
-            }
+            tasks = tasks.concat(addNS(id[i], args));
           }
         }
         // run the tasks
@@ -157,18 +161,7 @@ var voyager = Object.defineProperties({}, {
           return this.tasks_[id].call(this, args);
         // a namespace
         } else if (id in this.namespaces_) {
-          var i = 0
-            , l = this.namespaces_[id].length;
-          for (i; i < l; i++) {
-            var t = this.namespaces_[id][i];
-            if (typeof this.tasks_[t] === 'function') {
-              tasks.push(
-                new Promise(function (done, fail) {
-                  voyager.tasks_[t].call(voyager, args).then(done);
-                })
-              );
-            }
-          }
+          tasks = tasks.concat(addNS(id, args));
           // run all tasks
           return Promise.all(tasks);
         }

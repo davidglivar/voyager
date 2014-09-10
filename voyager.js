@@ -7,8 +7,10 @@
  * Module dependencies
  */
 var colors = require('colors')
+  , del = require('del')
   , Pinwheel = require('pinwheel')({ mark: '⚡' })
   , Promise = require('es6-promise').Promise
+  , requireDir = require('require-dir')
 
   , defaults = {
       spin: false
@@ -46,6 +48,9 @@ var voyager = Object.defineProperties({}, {
 , namespaces_: {
     value: {}
   }
+, BLD: {
+    value: this.CWD + '/build'
+  }
 , CWD: {
     value: process.cwd()
   }
@@ -55,12 +60,57 @@ var voyager = Object.defineProperties({}, {
 , SRC: {
     value: this.CWD + '/src'
   }
+
+, loadTasks_: {
+    value: function () {
+      // load default tasks
+      requireDir('./tasks');
+      // load installed voyager tasks
+      require('gulp-load-plugins')({ pattern: ['voyager-*'] });
+      // try loading any user defined tasks
+      try {
+        requireDir(this.CWD + '/tasks');
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
+, build: {
+    value: function (done) {
+      done = done || function () {};
+      this.loadTasks_();
+      this.clean()
+        .then(this.run.bind(this, ['prebuild', 'build']))
+        .then(done);
+    }
+  }
+
+, clean: {
+    value: function () {
+      return new Promise(function (done, fail) {
+        del([voyager.TMP, voyager.BLD], done);
+      });
+    }
+  }
+
+, start: {
+    value: function (done) {
+      done = done || function () {};
+      this.loadTasks_();
+      this.clean()
+        .then(this.run.bind(this, ['prebuild', 'serve', 'watch']))
+        .then(done);
+    }
+  }
+
   /**
    * Registers a task in the _tasks namespace. Tasks are automatically wrapped
    * in a Promise for chained execution.
    * @method
    * @public
-   * @param {string} key - The name under which this task will be registered
+   * @param {string} id - The name under which this task will be registered
+   * @param {string|Array} ns - Namespace(s) this task belongs to
    * @param {Function} func - The task definition
    * @param {Object} [opts={}] - Options for this task
    * @returns {Promise}
@@ -79,6 +129,7 @@ var voyager = Object.defineProperties({}, {
         , start = Date.now()
         , wheel = new Pinwheel('TASK: ' + id);
       // extend default options
+      if (ns.indexOf('watch') > 0 || ns === 'watch') options.spin = false;
       for (key in defaults) {
         var v = defaults[key];
         if (opts.hasOwnProperty(key)) {
@@ -165,9 +216,8 @@ var voyager = Object.defineProperties({}, {
           // run all tasks
           return Promise.all(tasks);
         }
-        // no tasks/namespaces found
-        return false;
       }
+      throw new Error(id + ' is neither a registered task or namespace.');
     }  
   }
 });

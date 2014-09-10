@@ -3,7 +3,6 @@
 var voyager = require('../voyager')
   , cmd = require('commander')
   , fs = require('graceful-fs')
-  , init = require('../lib/cmd.init')
   , join = require('path').join
   , reqd = require('require-dir')
 
@@ -16,28 +15,24 @@ try { reqd(join(CWD, 'tasks')); } catch (err) { console.error(err); }
 
 cmd.version(PKG.version);
 
-cmd.command('build')
-  .description('Build a production ready version of you site')
-  .action(voyager.run.bind(voyager, 'build'));
+//cmd.command('build')
+  //.description('Build a production ready version of you site')
+  //.action(voyager.run.bind(voyager, 'build'));
 
-cmd.command('clean')
-  .description('Destroy .dev and build directories')
-  .action(voyager.run.bind(voyager, 'clean'));
+//cmd.command('clean')
+  //.description('Destroy .dev and build directories')
+  //.action(voyager.run.bind(voyager, 'clean'));
 
-cmd.command('init')
-  .description('Create a new voyager project in an empty directory')
-  .action(init);
+//cmd.command('start')
+  //.alias('s')
+  //.description('Start the local static server and watch files for changes')
+  //.action(voyager.run.bind(voyager, 'start'));
 
-cmd.command('start')
-  .alias('s')
-  .description('Start the local static server and watch files for changes')
-  .action(voyager.run.bind(voyager, 'start'));
-
-cmd.command('task <taskname>')
-  .alias('t')
-  .description('Run a specific task, including custom defined tasks')
-  .action(function (taskname) {
-    voyager.run(taskname);
-  });
+//cmd.command('task <taskname>')
+  //.alias('t')
+  //.description('Run a specific task, including custom defined tasks')
+  //.action(function (taskname) {
+    //voyager.run(taskname);
+  //});
 
 cmd.parse(process.argv);

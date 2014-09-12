@@ -8,6 +8,7 @@
  */
 var colors = require('colors')
   , del = require('del')
+  , fs = require('graceful-fs')
   , Pinwheel = require('pinwheel')({ mark: '⚡' })
   , Promise = require('es6-promise').Promise
   , requireDir = require('require-dir')
@@ -65,8 +66,20 @@ var voyager = Object.defineProperties({}, {
     value: function () {
       // load default tasks
       requireDir('./tasks');
+
       // load installed voyager tasks
-      require('gulp-load-plugins')({ pattern: ['voyager-*'] });
+      var pkg = JSON.parse(fs.readFileSync(this.CWD + '/package.json', { encoding: 'utf8' }))
+        , scopes = ['dependencies', 'devDependencies'];
+      for (var i = 0, l = scopes.length; i < l; i++) {
+        if (pkg[scopes[i]]) {
+          for (var key in pkg[scopes[i]]) {
+            if (/^voyager\-/.test(key)) {
+              require(this.CWD + '/node_modules/' + key);
+            }
+          }
+        }
+      }
+
       // try loading any user defined tasks
       try {
         requireDir(this.CWD + '/tasks');
@@ -142,7 +155,9 @@ var voyager = Object.defineProperties({}, {
       if (Array.isArray(ns)) {
         for (var i = 0, l = ns.length; i < l; i++) {
           if (!this.namespaces_[ns[i]]) this.namespaces_[ns[i]] = [];
-          this.namespaces_[ns[i]].push(id);
+          if (this.namespaces_[ns[i]].indexOf(id) === -1) {
+            this.namespaces_[ns[i]].push(id);
+          }
         }
       } else {
         if (!this.namespaces_[ns]) this.namespaces_[ns] = [];

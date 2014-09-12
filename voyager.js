@@ -49,16 +49,16 @@ var voyager = Object.defineProperties({}, {
     value: {}
   }
 , BLD: {
-    value: this.CWD + '/build'
+    value: process.cwd() + '/build'
   }
 , CWD: {
     value: process.cwd()
   }
 , TMP: {
-    value: this.CWD + '/.dev'
+    value: process.cwd() + '/.dev'
   }
 , SRC: {
-    value: this.CWD + '/src'
+    value: process.cwd() + '/src'
   }
 
 , loadTasks_: {
@@ -126,7 +126,6 @@ var voyager = Object.defineProperties({}, {
       }
       var options = {}
         , key
-        , start = Date.now()
         , wheel = new Pinwheel('TASK: ' + id);
       // extend default options
       if (ns.indexOf('watch') > 0 || ns === 'watch') options.spin = false;
@@ -149,6 +148,7 @@ var voyager = Object.defineProperties({}, {
       }
       // register the task
       this.tasks_[id] = function () {
+        var start = Date.now();
         if (options.spin) {
           wheel.start();
         } else {

@@ -102,7 +102,6 @@ var voyager = Object.defineProperties({}, {
       this.loadTasks_();
       this.clean()
         .then(this.run.bind(this, ['prebuild', 'serve', 'watch']))
-        //.then(this.run.bind(this, ['prebuild', 'build']))
         .then(done);
     }
   }

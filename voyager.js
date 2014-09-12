@@ -27,7 +27,7 @@ function addNS(ns, args) {
       tasks.push(addTask(t, args));
     }
   }
-  return tasks;
+  return Promise.resolve(tasks);
 }
 
 function addTask(id, args) {
@@ -71,7 +71,9 @@ var voyager = Object.defineProperties({}, {
       try {
         requireDir(this.CWD + '/tasks');
       } catch (e) {
-        console.log(e);
+        if (e.errno !== 34) {
+          console.log(e);
+        }
       }
     }
   }
@@ -100,6 +102,7 @@ var voyager = Object.defineProperties({}, {
       this.loadTasks_();
       this.clean()
         .then(this.run.bind(this, ['prebuild', 'serve', 'watch']))
+        //.then(this.run.bind(this, ['prebuild', 'build']))
         .then(done);
     }
   }
@@ -184,41 +187,36 @@ var voyager = Object.defineProperties({}, {
    * Run a registered task
    * @method
    * @public
-   * @param {string} task - The task to run
+   * @param {string|Array} id - The task(s)/namespace(s) to run
    */
 , run: {
     value: function (id) {
-      var args = Array.prototype.slice.call(arguments, 1)
-        , tasks = [];
-      // array of tasks/namespaces
-      if (Array.isArray(id)) {
-        var i = 0
-          , l = id.length;
-        for (i; i < l; i++) {
-          // a task
-          if (typeof this.tasks_[id[i]] === 'function') {
-            tasks.push(addTask(id[i], args));
-          // a namespace
-          } else if (id[i] in this.namespaces_) {
-            tasks = tasks.concat(addNS(id[i], args));
-          }
+      var ids = Array.isArray(id) ? id : [id]
+        , tasks = []
+        , watches = [];
+      ids.forEach(function (name) {
+        if (name in voyager.namespaces_) {
+          voyager.namespaces_[name].forEach(function (t) {
+            if (name === 'watch') {
+              watches.push(t);
+            } else {
+              tasks.push(t);
+            }
+          });
+        } else if (name in voyager.tasks_) {
+          tasks.push(name);
+        } else {
+          throw new Error(name + ' is neither a registered task or namespace.');
         }
-        // run the tasks
-        return Promise.all(tasks);
-      // a singular task/namespace
-      } else {
-        // a task
-        if (typeof this.tasks_[id] === 'function') {
-          return this.tasks_[id].call(this, args);
-        // a namespace
-        } else if (id in this.namespaces_) {
-          tasks = tasks.concat(addNS(id, args));
-          // run all tasks
-          return Promise.all(tasks);
-        }
-      }
-      throw new Error(id + ' is neither a registered task or namespace.');
-    }  
+      });
+      tasks.reduce(function (sequence, task) {
+        return sequence.then(voyager.tasks_[task].bind(voyager));
+      }, Promise.resolve()).then(function () {
+        watches.forEach(function (t) {
+          voyager.tasks_[t].call(voyager);
+        });
+      });
+    }
   }
 });
 

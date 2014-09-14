@@ -223,7 +223,7 @@ var voyager = Object.defineProperties({}, {
           throw new Error(name + ' is neither a registered task or namespace.');
         }
       });
-      tasks.reduce(function (sequence, task) {
+      return tasks.reduce(function (sequence, task) {
         return sequence.then(voyager.tasks_[task].bind(voyager));
       }, Promise.resolve()).then(function () {
         watches.forEach(function (t) {

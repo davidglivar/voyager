@@ -1,4 +1,7 @@
-![voyager](/support/images/banner-722x280.png)
+<!--![voyager](/support/images/banner-722x280.png)-->
+
+Voyager
+=======
 
 A STATIC SITE GENERATOR FROM THE EDGE OF THE SOLAR SYSTEM.
 

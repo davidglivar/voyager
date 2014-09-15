@@ -37,31 +37,70 @@ function addTask(id, args) {
   });
 }
 
+/**
+ * Exported voyager namespace
+ * @namespace
+ */
 var voyager = Object.defineProperties({}, {
+
+  /**
+   * Immutable string representing the build path
+   * @member {string}
+   * @public
+   */
+  BLD: {
+    value: process.cwd() + '/build'
+  }
+
+  /**
+   * Immutable string representing the current working directory
+   * @member {string}
+   * @public
+   */
+, CWD: {
+    value: process.cwd()
+  }
+
+  /**
+   * Immutable string represeting the tempory build path
+   * @member {string}
+   * @public
+   */
+, TMP: {
+    value: process.cwd() + '/.dev'
+  }
+
+  /**
+   * Immutable string representing the source directory path
+   * @member {string}
+   * @public
+   */
+, SRC: {
+    value: process.cwd() + '/src'
+  }
+
+  /**
+   * Namespace for task namespaces
+   * @member {Object}
+   * @private
+   */
+, namespaces_: { value: {} }
+
   /**
    * Namespace for registered tasks
    * @member {Object}
    * @private
    */
-  tasks_: {
-    value: {}
-  }
-, namespaces_: {
-    value: {}
-  }
-, BLD: {
-    value: process.cwd() + '/build'
-  }
-, CWD: {
-    value: process.cwd()
-  }
-, TMP: {
-    value: process.cwd() + '/.dev'
-  }
-, SRC: {
-    value: process.cwd() + '/src'
-  }
+, tasks_: { value: {} }
 
+  /**
+   * Attempts to load all known voyager tasks. Order is as follows:
+   * 1) Default internal voyager tasks
+   * 2) voyager-* tasks installed via npm
+   * 3) User defined tasks within voyager application
+   * @method
+   * @private
+   */
 , loadTasks_: {
     value: function () {
       // load default tasks
@@ -91,6 +130,13 @@ var voyager = Object.defineProperties({}, {
     }
   }
 
+  /**
+   * Creates a production ready build
+   * Runs prebuild, build
+   * @method
+   * @public
+   * @param {Function} [done=function(){}] - Optional callback
+   */
 , build: {
     value: function (done) {
       done = done || function () {};
@@ -101,6 +147,12 @@ var voyager = Object.defineProperties({}, {
     }
   }
 
+  /**
+   * Cleans both the build and prebuild directories
+   * @method
+   * @public
+   * @returns {Promise}
+   */
 , clean: {
     value: function () {
       return new Promise(function (done, fail) {
@@ -109,6 +161,48 @@ var voyager = Object.defineProperties({}, {
     }
   }
 
+  /**
+   * Run a registered task
+   * @method
+   * @public
+   * @param {string|Array} id - The task(s)/namespace(s) to run
+   */
+, run: {
+    value: function (id) {
+      var ids = Array.isArray(id) ? id : [id]
+        , tasks = []
+        , watches = [];
+      ids.forEach(function (name) {
+        if (name in voyager.namespaces_) {
+          voyager.namespaces_[name].forEach(function (t) {
+            if (name === 'watch') {
+              watches.push(t);
+            } else {
+              tasks.push(t);
+            }
+          });
+        } else if (name in voyager.tasks_) {
+          tasks.push(name);
+        } else {
+          throw new Error(name + ' is neither a registered task or namespace.');
+        }
+      });
+      return tasks.reduce(function (sequence, task) {
+        return sequence.then(voyager.tasks_[task].bind(voyager));
+      }, Promise.resolve()).then(function () {
+        watches.forEach(function (t) {
+          voyager.tasks_[t].call(voyager);
+        });
+      });
+    }
+  }
+
+  /**
+   * Builds project into temporary directory and starts a static server
+   * Runs prebuild, serve, watch
+   * @method
+   * @public
+   */
 , start: {
     value: function (done) {
       done = done || function () {};
@@ -194,42 +288,6 @@ var voyager = Object.defineProperties({}, {
           return console.error(err);
         });
       };
-    }
-  }
-
-  /**
-   * Run a registered task
-   * @method
-   * @public
-   * @param {string|Array} id - The task(s)/namespace(s) to run
-   */
-, run: {
-    value: function (id) {
-      var ids = Array.isArray(id) ? id : [id]
-        , tasks = []
-        , watches = [];
-      ids.forEach(function (name) {
-        if (name in voyager.namespaces_) {
-          voyager.namespaces_[name].forEach(function (t) {
-            if (name === 'watch') {
-              watches.push(t);
-            } else {
-              tasks.push(t);
-            }
-          });
-        } else if (name in voyager.tasks_) {
-          tasks.push(name);
-        } else {
-          throw new Error(name + ' is neither a registered task or namespace.');
-        }
-      });
-      return tasks.reduce(function (sequence, task) {
-        return sequence.then(voyager.tasks_[task].bind(voyager));
-      }, Promise.resolve()).then(function () {
-        watches.forEach(function (t) {
-          voyager.tasks_[t].call(voyager);
-        });
-      });
     }
   }
 });

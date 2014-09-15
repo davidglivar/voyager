@@ -116,7 +116,7 @@ voyager.loadTasks_ = function () {
     if (pkg[scopes[i]]) {
       for (var key in pkg[scopes[i]]) {
         if (/^voyager\-/.test(key)) {
-          require(this.CWD + '/node_modules/' + key);
+          require(this.CWD + '/node_modules/' + key)(this);
         }
       }
     }

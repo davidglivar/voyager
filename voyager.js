@@ -116,7 +116,7 @@ voyager.loadTasks_ = function () {
     if (pkg[scopes[i]]) {
       for (var key in pkg[scopes[i]]) {
         if (/^voyager\-/.test(key)) {
-          require(this.CWD + '/node_modules/' + key);
+          require(this.CWD + '/node_modules/' + key)(this);
         }
       }
     }
@@ -159,8 +159,8 @@ voyager.clean = function () {
   });
 };
 
-voyager.dest = function () {
-  return vfs.dest(arguments);
+voyager.dest = function (out, options) {
+  return vfs.dest(out, options);
 };
 
 voyager.in = function (paths) {
@@ -231,8 +231,8 @@ voyager.run = function (id) {
   });
 };
 
-voyager.src = function () {
-  return vfs.src(arguments);
+voyager.src = function (glob, options) {
+  return vfs.src(glob, options);
 };
 
 /**

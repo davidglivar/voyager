@@ -159,8 +159,8 @@ voyager.clean = function () {
   });
 };
 
-voyager.dest = function () {
-  return vfs.dest(arguments);
+voyager.dest = function (out, options) {
+  return vfs.dest(out, options);
 };
 
 voyager.in = function (paths) {
@@ -231,8 +231,8 @@ voyager.run = function (id) {
   });
 };
 
-voyager.src = function () {
-  return vfs.src(arguments);
+voyager.src = function (glob, options) {
+  return vfs.src(glob, options);
 };
 
 /**

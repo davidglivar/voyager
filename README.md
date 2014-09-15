@@ -3,6 +3,8 @@ Voyager
 
 A STATIC SITE GENERATOR FROM THE EDGE OF THE SOLAR SYSTEM.
 
+[![wercker status](https://app.wercker.com/status/a6a9346cd1fa1d24d19799d710ddab22/m "wercker status")](https://app.wercker.com/project/bykey/a6a9346cd1fa1d24d19799d710ddab22)
+
 Installation
 ------------
 

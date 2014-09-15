@@ -1,5 +1,5 @@
-Voyager
-=======
+Voyager (alpha)
+===============
 
 A STATIC SITE GENERATOR FROM THE EDGE OF THE SOLAR SYSTEM.
 

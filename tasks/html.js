@@ -1,15 +1,17 @@
-var voyager = require('../voyager')
-  , vfs = require('vinyl-fs')
-  , CWD = process.cwd();
+var voyager = require('../voyager');
 
-voyager.task('html:finish', function (done) {
-  vfs.src([CWD + '/.dev/**/*.html'])
-    .pipe(vfs.dest(CWD + '/build'))
+voyager.task('html-prebuild', ['html', 'prebuild'], function (done) {
+  this.in.src('**/*.html')
+    .pipe(this.out.dev())
     .on('end', done);
 });
 
-voyager.task('html', function (done) {
-  vfs.src([CWD + '/src/**/*.html'])
-    .pipe(vfs.dest(CWD + '/.dev'))
+voyager.task('html-build', ['html', 'build'], function (done) {
+  this.in.dev('**/*.html')
+    .pipe(this.out.bld())
     .on('end', done);
+});
+
+voyager.task('html-watch', 'watch', function () {
+  this.watch('**/*.html', 'html-prebuild');
 });

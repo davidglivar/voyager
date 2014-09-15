@@ -1,25 +1,17 @@
-var voyager = require('../voyager')
-  , cache = require('gulp-cache')
-  , imagemin = require('gulp-imagemin')
-  , vfs = require('vinyl-fs')
-  , CWD = process.cwd();
+var voyager = require('../voyager');
 
-voyager.task('images:finish', function (done) {
-  vfs.src([CWD + '/.dev/images/**'])
-    .pipe(cache(imagemin({
-      progressive: true,
-      interlaced: true
-    })))
-    .pipe(vfs.dest(CWD + '/build/images'))
+voyager.task('images-prebuild', ['images', 'prebuild'], function (done) {
+  this.in.src('images/*')
+    .pipe(this.out.dev('images'))
     .on('end', done);
 });
 
-voyager.task('images', function (done) {
-  vfs.src([CWD + '/src/images/**'])
-    .pipe(cache(imagemin({
-      progressive: true,
-      interlaced: true
-    })))
-    .pipe(vfs.dest(CWD + '/.dev/images'))
+voyager.task('images-build', ['images', 'build'], function (done) {
+  this.in.dev('images/*')
+    .pipe(this.out.bld('images'))
     .on('end', done);
+});
+
+voyager.task('images-watch', 'watch', function () {
+  this.watch('images/*', 'images-prebuild');
 });

@@ -1,23 +1,34 @@
-var voyager = require('../voyager')
-  , vfs = require('vinyl-fs')
-  , CWD = process.cwd();
+var voyager = require('../voyager');
 
-voyager.task('artifacts', function (done) {
-  vfs.src([
-      CWD + '/src/*.txt'
-    , CWD + '/src/apple-touch-icon-precomposed.png'
-    , CWD + '/src/favicon.ico'
+voyager.task('artifacts-prebuild', ['artifacts', 'prebuild'], function (done) {
+  this.in.src([
+      'favicon.ico'
+    , 'humans.txt'
+    , 'robots.txt'
+    , 'apple-touch-icon-precomposed.png'
     ])
-    .pipe(vfs.dest(CWD + '/.dev'))
+    .pipe(this.out.dev())
     .on('end', done);
 });
 
-voyager.task('artifacts:finish', function (done) {
-  vfs.src([
-      CWD + '/.dev/*.txt'
-    , CWD + '/.dev/apple-touch-icon-precomposed.png'
-    , CWD + '/.dev/favicon.ico'
+voyager.task('artifacts-build', ['artifacts', 'build'], function (done) {
+  this.in.dev([
+      'favicon.ico'
+    , 'humans.txt'
+    , 'robots.txt'
+    , 'apple-touch-icon-precomposed.png'
     ])
-    .pipe(vfs.dest(CWD + '/build'))
+    .pipe(this.out.bld())
     .on('end', done);
+});
+
+voyager.task('artifacts-watch', 'watch', function () {
+  this.watch([
+      'favicon.ico'
+    , 'humans.txt'
+    , 'robots.txt'
+    , 'apple-touch-icon-precomposed.png'
+    ]
+  , 'artifacts-prebuild'
+  );
 });

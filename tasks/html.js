@@ -1,18 +1,17 @@
-var voyager = require('../voyager')
-  , vfs = require('vinyl-fs');
+var voyager = require('../voyager');
 
 voyager.task('html-prebuild', ['html', 'prebuild'], function (done) {
-  vfs.src(this.SRC + '/**/*.html')
-    .pipe(vfs.dest(this.TMP))
+  this.in.src('**/*.html')
+    .pipe(this.out.dev())
     .on('end', done);
 });
 
 voyager.task('html-build', ['html', 'build'], function (done) {
-  vfs.src(this.TMP + '/**/*.html')
-    .pipe(vfs.dest(this.BLD))
+  this.in.dev('**/*.html')
+    .pipe(this.out.bld())
     .on('end', done);
 });
 
 voyager.task('html-watch', 'watch', function () {
-  vfs.watch(this.SRC + '/**/*.html', this.run.bind(this, 'html-prebuild'));
+  this.watch('**/*.html', 'html-prebuild');
 });

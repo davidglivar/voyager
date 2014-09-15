@@ -1,4 +1,5 @@
 var expect = require('expect.js')
+  , util = require('util')
   , voyager = require('../voyager');
 
 function cleanObject(obj) {
@@ -40,16 +41,6 @@ describe('voyager', function () {
       expect(voyager.tasks_).to.be.an('object');
     });
 
-    it('is not writable', function () {
-      voyager.tasks_ = { w: false };
-      expect(voyager.tasks_).to.eql(o);
-    });
-
-    it('is not configurable', function () {
-      voyager.tasks_ = [];
-      expect(voyager.tasks_).to.eql(o);
-    });
-
     it('allows properties to be added', function () {
       voyager.tasks_.test = true;
       expect(voyager.tasks_).to.not.eql(o);
@@ -64,44 +55,99 @@ describe('voyager', function () {
     });
   });
 
-  describe('#task()', function () {
-    afterEach(function () {
-      voyager.tasks_ = cleanObject(voyager.tasks_);
-      voyager.namespaces_ = cleanObject(voyager.namespaces_);
-    });
-
+  describe('#in()', function () {
+    
     it('exists within the voyager namespace as a function', function () {
-      expect(voyager).to.have.property('task');
-      expect(voyager.task).to.be.a('function');
-      expect(voyager.task.length).to.be(4);
+      expect(voyager).to.have.property('in');
+      expect(voyager.in).to.be.a('function');
+      expect(voyager.in.length).to.be(1);
     });
 
-    it('registers a task given a name and function', function () {
-      var func = function () {};
-      voyager.task('name', func);
-      expect(voyager.tasks_).to.have.property('name');
-      expect(voyager.tasks_.name).to.be.a('function');
+    it('returns a stream', function () {
+      var s = voyager.in('test');
+      expect(s).to.be.ok();
+      expect(s).to.have.property('on');
+      expect(s.on).to.be.a('function');
     });
 
-    it('stores the task id in the given namespace', function () {
-      var func = function () {};
-      voyager.task('name', ['scripts', 'watch'], func);
-      voyager.task('test', 'testing', func);
-      expect(voyager.tasks_).to.have.property('name');
-      expect(voyager.namespaces_).to.have.property('scripts');
-      expect(voyager.namespaces_).to.have.property('watch');
-      expect(voyager.namespaces_).to.have.property('testing');
-      expect(voyager.namespaces_.scripts.indexOf('name')).to.be(0);
-      expect(voyager.namespaces_.watch.indexOf('name')).to.be(0);
-      expect(voyager.namespaces_.testing.indexOf('test')).to.be(0);
+    describe('#in.src()', function () {
+
+      it('exists within the voyager.in namespace as a function', function () {
+        expect(voyager.in).to.have.property('src');
+        expect(voyager.in.src).to.be.a('function');
+        expect(voyager.in.src.length).to.be(1);
+      });
+
+      it('returns a stream', function () {
+        var s = voyager.in.src('test');
+        expect(s).to.be.ok();
+        expect(s).to.have.property('on');
+        expect(s.on).to.be.a('function');
+      });
     });
 
-    it('stores the task id in the default namespace if none provided', function () {
-      var func = function () {};
-      voyager.task('name', func);
-      expect(voyager.tasks_).to.have.property('name');
-      expect(voyager.namespaces_).to.have.property('ns');
-      expect(voyager.namespaces_.ns.indexOf('name')).to.be(0);
+    describe('#in.dev()', function () {
+
+      it('exists within the voyager.in namespace as a function', function () {
+        expect(voyager.in).to.have.property('dev');
+        expect(voyager.in.dev).to.be.a('function');
+        expect(voyager.in.dev.length).to.be(1);
+      });
+
+      it('returns a stream', function () {
+        var s = voyager.in.dev('test');
+        expect(s).to.be.ok();
+        expect(s).to.have.property('on');
+        expect(s.on).to.be.a('function');
+      });
+    });
+  });
+
+  describe('#out()', function () {
+    
+    it('exists within the voyager namespace as a function', function () {
+      expect(voyager).to.have.property('out');
+      expect(voyager.out).to.be.a('function');
+      expect(voyager.out.length).to.be(1);
+    });
+
+    it('returns a stream', function () {
+      var s = voyager.out('out_test');
+      expect(s).to.be.ok();
+      expect(s).to.have.property('on');
+      expect(s.on).to.be.a('function');
+    });
+
+    describe('#out.bld()', function () {
+
+      it('exists within the voyager.out namespace as a function', function () {
+        expect(voyager.out).to.have.property('bld');
+        expect(voyager.out.bld).to.be.a('function');
+        expect(voyager.out.bld.length).to.be(1);
+      });
+
+      it('returns a stream', function () {
+        var s = voyager.out.bld('out_test');
+        expect(s).to.be.ok();
+        expect(s).to.have.property('on');
+        expect(s.on).to.be.a('function');
+      });
+    });
+
+    describe('#out.dev()', function () {
+
+      it('exists within the voyager.out namespace as a function', function () {
+        expect(voyager.out).to.have.property('dev');
+        expect(voyager.out.dev).to.be.a('function');
+        expect(voyager.out.dev.length).to.be(1);
+      });
+
+      it('returns a stream', function () {
+        var s = voyager.out.dev('out_test');
+        expect(s).to.be.ok();
+        expect(s).to.have.property('on');
+        expect(s.on).to.be.a('function');
+      });
     });
   });
 
@@ -144,6 +190,47 @@ describe('voyager', function () {
           expect(flag).to.be(true);
           done();
         });
+    });
+  });
+
+  describe('#task()', function () {
+    afterEach(function () {
+      voyager.tasks_ = cleanObject(voyager.tasks_);
+      voyager.namespaces_ = cleanObject(voyager.namespaces_);
+    });
+
+    it('exists within the voyager namespace as a function', function () {
+      expect(voyager).to.have.property('task');
+      expect(voyager.task).to.be.a('function');
+      expect(voyager.task.length).to.be(4);
+    });
+
+    it('registers a task given a name and function', function () {
+      var func = function () {};
+      voyager.task('name', func);
+      expect(voyager.tasks_).to.have.property('name');
+      expect(voyager.tasks_.name).to.be.a('function');
+    });
+
+    it('stores the task id in the given namespace', function () {
+      var func = function () {};
+      voyager.task('name', ['scripts', 'watch'], func);
+      voyager.task('test', 'testing', func);
+      expect(voyager.tasks_).to.have.property('name');
+      expect(voyager.namespaces_).to.have.property('scripts');
+      expect(voyager.namespaces_).to.have.property('watch');
+      expect(voyager.namespaces_).to.have.property('testing');
+      expect(voyager.namespaces_.scripts.indexOf('name')).to.be(0);
+      expect(voyager.namespaces_.watch.indexOf('name')).to.be(0);
+      expect(voyager.namespaces_.testing.indexOf('test')).to.be(0);
+    });
+
+    it('stores the task id in the default namespace if none provided', function () {
+      var func = function () {};
+      voyager.task('name', func);
+      expect(voyager.tasks_).to.have.property('name');
+      expect(voyager.namespaces_).to.have.property('ns');
+      expect(voyager.namespaces_.ns.indexOf('name')).to.be(0);
     });
   });
 });

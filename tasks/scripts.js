@@ -1,21 +1,17 @@
-var voyager = require('../voyager')
-  , vfs = require('vinyl-fs');
+var voyager = require('../voyager');
 
 voyager.task('scripts-prebuild', ['scripts', 'prebuild'], function (done) {
-  vfs.src(this.SRC + '/javascripts/**/*.js')
-    .pipe(vfs.dest(this.TMP + '/javascripts'))
+  this.in.src('javascripts/**/*.js')
+    .pipe(this.out.dev('javascripts'))
     .on('end', done);
 });
 
 voyager.task('scripts-build', ['scripts', 'build'], function (done) {
-  vfs.src(this.TMP + '/javascripts/**/*.js')
-    .pipe(vfs.dest(this.BLD + '/javascripts'))
+  this.in.dev('javascripts/**/*.js')
+    .pipe(this.out.bld('javascripts'))
     .on('end', done);
 });
 
 voyager.task('scripts-watch', 'watch', function () {
-  vfs.watch(
-    this.SRC + '/javascripts/**/*.js'
-  , this.run.bind(this, 'scripts-prebuild')
-  );
+  this.watch('javascripts/**/*.js', 'scripts-prebuild');
 });

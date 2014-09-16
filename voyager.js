@@ -325,10 +325,12 @@ voyager.task = function (id, ns, func, opts) {
   };
 };
 
-voyager.watch = function (paths, tasks) {
+voyager.watch = function (paths, tasks, override) {
+  override = override || false;
   if (!Array.isArray(paths)) paths = [paths];
   paths = paths.map(function (p) {
-    return path.relative(voyager.CWD, path.join(voyager.SRC, p));
+    var b = override ? '' : voyager.SRC;
+    return path.relative(voyager.CWD, path.join(b, p));
   });
   if (typeof tasks === 'undefined') return false;
   if (typeof tasks === 'function') {

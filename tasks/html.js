@@ -1,6 +1,6 @@
 var voyager = require('../voyager');
 
-voyager.task('html-prebuild', ['html', 'prebuild'], function (done) {
+voyager.task('html-write', ['html', 'write'], function (done) {
   this.in.src('**/*.html')
     .pipe(this.out.dev())
     .on('end', done);
@@ -13,5 +13,5 @@ voyager.task('html-build', ['html', 'build'], function (done) {
 });
 
 voyager.task('html-watch', 'watch', function () {
-  this.watch('**/*.html', 'html-prebuild');
+  this.watch('**/*.html', 'html-write');
 });

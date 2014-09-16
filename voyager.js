@@ -16,7 +16,7 @@ var colors = require('colors')
   , vfs = require('vinyl-fs')
 
   , defaults = {
-      spin: false
+      spin: true
     , namespaces: []
     };
 
@@ -143,7 +143,7 @@ voyager.build = function (done) {
   done = done || function () {};
   this.loadTasks_();
   this.clean()
-    .then(this.run.bind(this, ['prebuild', 'build']))
+    .then(this.run.bind(this, ['read', 'transform', 'write', 'build']))
     .then(done);
 };
 
@@ -219,7 +219,7 @@ voyager.run = function (id) {
     } else if (name in voyager.tasks_) {
       tasks.push(name);
     } else {
-      throw new Error(name + ' is neither a registered task or namespace.');
+      console.log('No registered tasks under name ' + name + ', skipping.');
     }
   });
   return tasks.reduce(function (sequence, task) {
@@ -245,7 +245,7 @@ voyager.start = function (done) {
   done = done || function () {};
   this.loadTasks_();
   this.clean()
-    .then(this.run.bind(this, ['prebuild', 'serve', 'watch']))
+    .then(this.run.bind(this, ['read', 'transform', 'write', 'serve', 'watch']))
     .then(done);
 };
 

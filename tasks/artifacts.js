@@ -1,6 +1,6 @@
 var voyager = require('../voyager');
 
-voyager.task('artifacts-prebuild', ['artifacts', 'prebuild'], function (done) {
+voyager.task('artifacts-write', ['artifacts', 'write'], function (done) {
   this.in.src([
       'favicon.ico'
     , 'humans.txt'
@@ -29,6 +29,6 @@ voyager.task('artifacts-watch', 'watch', function () {
     , 'robots.txt'
     , 'apple-touch-icon-precomposed.png'
     ]
-  , 'artifacts-prebuild'
+  , 'artifacts-write'
   );
 });

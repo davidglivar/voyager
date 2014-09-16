@@ -1,6 +1,6 @@
 var voyager = require('../voyager');
 
-voyager.task('images-prebuild', ['images', 'prebuild'], function (done) {
+voyager.task('images-write', ['images', 'write'], function (done) {
   this.in.src('images/*')
     .pipe(this.out.dev('images'))
     .on('end', done);
@@ -13,5 +13,5 @@ voyager.task('images-build', ['images', 'build'], function (done) {
 });
 
 voyager.task('images-watch', 'watch', function () {
-  this.watch('images/*', 'images-prebuild');
+  this.watch('images/*', 'images-write');
 });

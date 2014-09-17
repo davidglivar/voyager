@@ -1,4 +1,116 @@
+/**
+ * Module dependencies
+ */
+var colors = require('colors')
+  , del = require('del')
+  , ecstatic = require('ecstatic')
+  , http = require('http')
+  , path = require('path')
+  , Promise = require('es6-promise').Promise
+  , Task = require('./lib/task')
+  , Watch = require('./lib/watch');
 
+var phases = ['read', 'write', 'build']
+  , PORT = process.env.PORT || 3000
+  , CWD = process.cwd()
+  , BLD = path.join(CWD, 'build')
+  , DEV = path.join(CWD, '.dev')
+  , SRC = path.join(CWD, 'src');
+
+function findTask(phase, name) {
+  var i = 0
+    , l = voyager.tasks_.length;
+  for (i; i < l; i++) {
+    var t = voyager.tasks_[i];
+    if (t.phase === phase && t.name === name) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function getTask(id, name) {
+  var i = 0
+    , l = voyager.tasks_.length
+    , tasks = [];
+  for (i; i < l; i++) {
+    var t = voyager.tasks_[i];
+    if (t[id] === name) {
+      tasks.push(t);
+    }
+  }
+  return tasks;
+}
+
+function getTasks(tasks) {
+  var queue = []
+    , i = 0
+    , l = tasks.length;
+  for (i; i < l; i++) {
+    var id = 'name';
+    if (phases.indexOf(tasks[i]) >= 0) {
+      id = 'phase';
+    }
+    queue = queue.concat(getTask(id, tasks[i]));
+  }
+  return queue.sort(function (a, b) {
+    if (phases.indexOf(a.phase) < phases.indexOf(b.phase)) {
+      return -1;
+    }
+    return 1;
+  });
+}
+
+var voyager = {
+
+  tasks_: []
+
+, watches_: []
+
+, build: function () {
+    this.clean()
+      .then(this.run.bind(this, phases));
+  }
+
+, clean: function () {
+    return new Promise(function (done, fail) {
+      del([DEV, BLD], done);
+    });
+  }
+
+, run: function (tasks) {
+    tasks = Array.isArray(tasks) ? tasks : [tasks];
+    var queue = getTasks(tasks);
+    return queue.reduce(function (a, b) {
+      return a.then(b.func());
+    }, Promise.resolve());
+  }
+
+, start: function () {
+    this.clean()
+      .then(this.run.bind(this, ['read', 'write']))
+      .then(function () {
+        http.createServer(ecstatic({ root: DEV })).listen(PORT);
+        console.log(('\n\tListening on port ' + PORT + '\n').cyan);
+      });
+  }
+
+, task: function (phase, name, func) {
+    var task = new Task(phase, name, func)
+      , idx = findTask(phase, name);
+    if (idx < 0) {
+      this.tasks_.push(task);
+    } else {
+      this.tasks_.splice(idx, 1, task);
+    }
+    return true;
+  }
+
+, watch: function () {}
+
+};
+
+module.exports = voyager;
 
 
 

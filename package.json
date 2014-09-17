@@ -4,7 +4,8 @@
   "description": "A STATIC SITE GENERATOR FROM THE EDGE OF THE SOLAR SYSTEM.",
   "main": "voyager.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha -R spec"
+    "test": "ENV=test ./node_modules/.bin/mocha -R spec",
+    "watch": "ENV=test ./node_modules/.bin/mocha -R list -w"
   },
   "author": "David Glivar <davidglivar@gmail.com>",
   "license": "ISC",

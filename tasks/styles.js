@@ -1,17 +1,17 @@
 var voyager = require('../voyager');
 
-voyager.task('styles-write', ['styles', 'write'], function (done) {
-  this.in.src('stylesheets/**/*.css')
-    .pipe(this.out.dev('stylesheets'))
+voyager.task('write', 'styles', function (done) {
+  this.src('stylesheets/**/*.css')
+    .pipe(this.out('stylesheets'))
     .on('end', done);
 });
 
-voyager.task('styles-build', ['styles', 'build'], function (done) {
-  this.in.dev('stylesheets/**/*.css')
-    .pipe(this.out.bld('stylesheets'))
+voyager.task('build', 'styles', function (done) {
+  this.src('stylesheets/**/*.css')
+    .pipe(this.out('stylesheets'))
     .on('end', done);
 });
 
-voyager.task('styles-watch', 'watch', function () {
-  this.watch('stylesheets/**/*.css', 'styles-write');
-});
+//voyager.task('styles-watch', 'watch', function () {
+  //this.watch('stylesheets/**/*.css', 'styles-write');
+//});

@@ -4,6 +4,7 @@
 var colors = require('colors')
   , del = require('del')
   , ecstatic = require('ecstatic')
+  , fs = require('graceful-fs')
   , http = require('http')
   , path = require('path')
   , Promise = require('es6-promise').Promise
@@ -12,7 +13,7 @@ var colors = require('colors')
 
 var phases = ['read', 'write', 'build']
   , PORT = process.env.PORT || 3000
-  , CWD = process.cwd()
+  , CWD = process.env.ENV === 'test' ? process.cwd() + '/test/project' : process.cwd()
   , BLD = path.join(CWD, 'build')
   , DEV = path.join(CWD, '.dev')
   , SRC = path.join(CWD, 'src');
@@ -61,6 +62,37 @@ function getTasks(tasks) {
   });
 }
 
+function loadTasks() {
+  var internals = fs.readdirSync(path.join(__dirname, 'tasks'))
+    , externals = null;
+
+  if (fs.exists(path.join(CWD, 'tasks'))) {
+    externals = fs.readdirSync(path.join(CWD, 'tasks'));
+  }
+
+  internals.forEach(function (f) {
+    require(path.join(__dirname, 'tasks', f));
+  });
+
+  var pkg = JSON.parse(fs.readFileSync(path.join(CWD, 'package.json'), { encoding: 'utf8' }))
+    , scopes = ['dependencies', 'devDependencies'];
+  scopes.forEach(function (scope) {
+    if (pkg[scope]) {
+      for (var key in pkg[scopes]) {
+        if (/^voyager\-/.test(key)) {
+          require(path.join(__dirname, 'node_modules', key))(voyager);
+        }
+      }
+    }
+  });
+
+  if (externals && externals.length) {
+    externals.forEach(function (f) {
+      require(path.join(CWD, 'tasks', f));
+    });
+  }
+}
+
 var voyager = {
 
   tasks_: []
@@ -68,7 +100,8 @@ var voyager = {
 , watches_: []
 
 , build: function () {
-    this.clean()
+    //loadTasks();
+    return this.clean()
       .then(this.run.bind(this, phases));
   }
 
@@ -79,6 +112,7 @@ var voyager = {
   }
 
 , run: function (tasks) {
+    //loadTasks();
     tasks = Array.isArray(tasks) ? tasks : [tasks];
     var queue = getTasks(tasks);
     return queue.reduce(function (a, b) {
@@ -87,11 +121,13 @@ var voyager = {
   }
 
 , start: function () {
+    loadTasks();
     this.clean()
       .then(this.run.bind(this, ['read', 'write']))
       .then(function () {
         http.createServer(ecstatic({ root: DEV })).listen(PORT);
         console.log(('\n\tListening on port ' + PORT + '\n').cyan);
+        return Promise.resolve();
       });
   }
 

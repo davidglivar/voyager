@@ -1,17 +1,17 @@
 var voyager = require('../voyager');
 
-voyager.task('scripts-write', ['scripts', 'write'], function (done) {
-  this.in.src('javascripts/**/*.js')
-    .pipe(this.out.dev('javascripts'))
+voyager.task('write', 'scripts', function (done) {
+  this.src('javascripts/**/*.js')
+    .pipe(this.out('javascripts'))
     .on('end', done);
 });
 
-voyager.task('scripts-build', ['scripts', 'build'], function (done) {
-  this.in.dev('javascripts/**/*.js')
-    .pipe(this.out.bld('javascripts'))
+voyager.task('build', 'scripts', function (done) {
+  this.src('javascripts/**/*.js')
+    .pipe(this.out('javascripts'))
     .on('end', done);
 });
 
-voyager.task('scripts-watch', 'watch', function () {
-  this.watch('javascripts/**/*.js', 'scripts-write');
-});
+//voyager.task('scripts-watch', 'watch', function () {
+  //this.watch('javascripts/**/*.js', 'scripts-write');
+//});

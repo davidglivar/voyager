@@ -100,7 +100,6 @@ var voyager = {
 , watches_: []
 
 , build: function () {
-    //loadTasks();
     return this.clean()
       .then(this.run.bind(this, phases));
   }
@@ -112,7 +111,7 @@ var voyager = {
   }
 
 , run: function (tasks) {
-    //loadTasks();
+    loadTasks();
     tasks = Array.isArray(tasks) ? tasks : [tasks];
     var queue = getTasks(tasks);
     return queue.reduce(function (a, b) {
@@ -121,7 +120,6 @@ var voyager = {
   }
 
 , start: function () {
-    loadTasks();
     this.clean()
       .then(this.run.bind(this, ['read', 'write']))
       .then(function () {

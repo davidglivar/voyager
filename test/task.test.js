@@ -237,6 +237,9 @@ describe('Task', function () {
     });
 
     describe('#find()', function () {
+      afterEach(function () {
+        Task.collection.splice(0, Task.collection.length);
+      });
 
       it('exists on Task as a function', function () {
         expect(Task).to.have.property('find');
@@ -245,21 +248,65 @@ describe('Task', function () {
       });
 
       it('returns -1 for an unregistered Task', function () {
-
+        expect(Task.collection.length).to.be(0);
+        expect(Task.find('read', 'test')).to.be(-1);
       });
 
-      it('returns the correct index of a registered task');
+      it('returns the correct index of a registered task', function () {
+        voyager.task('write', 'test', function (d) { d(); });
+        voyager.task('read', 'test', function (d) { d(); });
+        expect(Task.find('read', 'test')).to.be(1);
+        expect(Task.find('write', 'test')).to.be(0);
+      });
     });
 
     describe('#get()', function () {
-      it('exists on Task as a function');
-      it('returns an array of Task instances');
-      it('returns the proper task given the id to check and task name');
+      afterEach(function () {
+        Task.collection.splice(0, Task.collection.length);
+      });
+
+      it('exists on Task as a function', function () {
+        expect(Task).to.have.property('get');      
+        expect(Task.get).to.be.a('function');
+        expect(Task.get.length).to.be(2);
+      });
+
+      it('returns an array of Task instances', function () {
+        var result;
+        voyager.task('read', 'test', function (d) { d(); });
+        result = Task.get('phase', 'read');
+        expect(result).to.be.ok();
+        expect(result).to.be.an('array');
+        expect(result.length).to.be(1);
+        expect(result[0] instanceof Task).to.be(true);
+      });
+
+      it('returns the proper task given the id to check and task name', function () {
+        var result;
+        voyager.task('read', 'test', function (d) { d(); });
+        result = Task.get('phase', 'read');
+        expect(result[0].phase).to.be('read');
+      });
     });
 
     describe('#replace()', function () {
-      it('exists on Task as a function');
-      it('replaces a Task at a given index');
+      afterEach(function () {
+        Task.collection.splice(0, Task.collection.length);
+      });
+
+      it('exists on Task as a function', function () {
+        expect(Task).to.have.property('replace');
+        expect(Task.replace).to.be.a('function');
+        expect(Task.replace.length).to.be(2);
+      });
+
+      it('replaces a Task at a given index', function () {
+        voyager.task('read', 'test', function (d) { d(); });
+        Task.replace(0, new Task('write', 'new-test', function (d) { d(); }));
+        expect(Task.collection.length).to.be(1);
+        expect(Task.collection[0].phase).to.be('write');
+        expect(Task.collection[0].name).to.be('new-test');
+      });
     });
   });
 });

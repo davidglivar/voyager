@@ -12,6 +12,4 @@ voyager.task('build', 'fonts', function (done) {
     .on('end', done);
 });
 
-//voyager.task('fonts-watch', 'watch', function () {
-  //this.watch('fonts/*', 'fonts-write');
-//});
+voyager.watch('fonts/*', 'fonts');

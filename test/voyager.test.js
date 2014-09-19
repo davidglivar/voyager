@@ -13,6 +13,7 @@ describe('voyager', function () {
     expect(Object.keys(voyager).length).to.be.above(0);
     expect(voyager).to.only.have.keys(
       'build'
+    , 'cancelWatch'
     , 'clean'
     , 'run'
     , 'task'

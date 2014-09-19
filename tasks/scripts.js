@@ -12,6 +12,4 @@ voyager.task('build', 'scripts', function (done) {
     .on('end', done);
 });
 
-//voyager.task('scripts-watch', 'watch', function () {
-  //this.watch('javascripts/**/*.js', 'scripts-write');
-//});
+voyager.watch('javascripts/**/*.js', 'scripts');

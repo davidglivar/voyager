@@ -22,13 +22,9 @@ voyager.task('build', 'artifacts', function (done) {
     .on('end', done);
 });
 
-//voyager.task('artifacts-watch', 'watch', function () {
-  //this.watch([
-      //'favicon.ico'
-    //, 'humans.txt'
-    //, 'robots.txt'
-    //, 'apple-touch-icon-precomposed.png'
-    //]
-  //, 'artifacts-write'
-  //);
-//});
+voyager.watch([
+      'favicon.ico'
+    , 'humans.txt'
+    , 'robots.txt'
+    , 'apple-touch-icon-precomposed.png'
+  ], 'artifacts');

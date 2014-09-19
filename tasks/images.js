@@ -12,6 +12,4 @@ voyager.task('build', 'images', function (done) {
     .on('end', done);
 });
 
-//voyager.task('images-watch', 'watch', function () {
-  //this.watch('images/*', 'images-write');
-//});
+voyager.watch('images/*', 'images');

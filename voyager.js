@@ -62,6 +62,14 @@ var voyager = {
       .then(this.run.bind(this, phases));
   }
 
+, cancelWatch: function (patterns) {
+    var watch = Watch.find(patterns);
+    if (watch) {
+      var idx = Watch.collection.indexOf(watch);
+      Watch.collection.splice(idx, 1);
+    }
+  }
+
 , clean: function () {
     return new Promise(function (done, fail) {
       del([DEV, BLD], done);

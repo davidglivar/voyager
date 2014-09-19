@@ -12,6 +12,4 @@ voyager.task('build', 'styles', function (done) {
     .on('end', done);
 });
 
-//voyager.task('styles-watch', 'watch', function () {
-  //this.watch('stylesheets/**/*.css', 'styles-write');
-//});
+voyager.watch('stylesheets/**/*.css', 'styles');

@@ -1,5 +1,4 @@
-var voyager = require('../voyager')
-  , log = require('gulp-filelog');
+var voyager = require('../voyager');
 
 voyager.task('write', 'html', function (done) {
   this.src('**/*.html')

@@ -58,9 +58,46 @@ describe('Watch', function () {
   });
 
   describe('#add()', function () {
-    
     it('exists on the instance as a function');
     it('adds a task to the read task queue');
     it('replaces the write task in the task namespace');
+  });
+
+  describe('#start()', function () {
+    afterEach(function () {
+      Watch.collection.splice(0, Watch.collection.length);
+    });
+    
+    it('exists on the instance as a function');
+  });
+
+  describe('static members', function () {
+
+    describe('collection', function () {
+      afterEach(function () {
+        Watch.collection.splice(0, Watch.collection.length);
+      });
+      it('exists as an Array');
+    });
+    
+    describe('#add()', function () {
+      afterEach(function () {
+        Watch.collection.splice(0, Watch.collection.length);
+      });
+      it('exists within Watch as a function');
+      it('throw an error if argument is not an instance of Watch');
+      it('adds a Watch instance to Watch.collection');
+    });
+
+    describe('#find()', function () {
+      afterEach(function () {
+        Watch.collection.splice(0, Watch.collection.length);
+      });
+      it('exists within Watch as a function');
+      it('throws an error if argument is not an Array');
+      it('throws an error if it finds more than one Watch instance with the same pattern');
+      it('returns false if no Watch instance was found');
+      it('returns a Watch instance');
+    });
   });
 });

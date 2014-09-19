@@ -1,3 +1,6 @@
 .DS_Store
-/sandbox
+sandbox
 /node_modules
+.dev
+build
+*.log

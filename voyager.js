@@ -34,9 +34,13 @@ function loadTasks() {
     , scopes = ['dependencies', 'devDependencies'];
   scopes.forEach(function (scope) {
     if (pkg[scope]) {
-      for (var key in pkg[scopes]) {
+      for (var key in pkg[scope]) {
         if (/^voyager\-/.test(key)) {
-          require(path.join(__dirname, 'node_modules', key))(voyager);
+          try {
+            require(path.join(CWD, 'node_modules', key))(voyager);
+          } catch (e) {
+            console.log(e);
+          }
         }
       }
     }
@@ -63,6 +67,7 @@ var voyager = {
   }
 
 , cancelWatch: function (patterns) {
+    patterns = Array.isArray(patterns) ? patterns : [patterns];
     var watch = Watch.find(patterns);
     if (watch) {
       var idx = Watch.collection.indexOf(watch);
@@ -117,6 +122,13 @@ var voyager = {
   }
 
 };
+
+Object.defineProperties(voyager, {
+  CWD: { value: CWD }
+, BLD: { value: BLD }
+, DEV: { value: DEV }
+, SRC: { value: SRC }
+});
 
 module.exports = voyager;
 

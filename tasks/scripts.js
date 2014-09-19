@@ -1,6 +1,7 @@
 var voyager = require('../voyager');
 
 voyager.task('write', 'scripts', function (done) {
+  console.log('im default');
   this.src('javascripts/**/*.js')
     .pipe(this.out('javascripts'))
     .on('end', done);

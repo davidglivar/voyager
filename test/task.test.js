@@ -1,6 +1,7 @@
 var expect = require('expect.js')
   , path = require('path')
-  , Task = require('../lib/task');
+  , Task = require('../lib/task')
+  , voyager = require('../voyager');
 
 describe('Task', function () {
 
@@ -153,27 +154,112 @@ describe('Task', function () {
   describe('static members', function () {
 
     describe('collection', function () {
-      it('');
+
+      it('exists as an Array', function () {
+        expect(Task).to.have.property('collection');
+        expect(Task.collection).to.be.an('array');
+      });
     });
 
     describe('#add()', function () {
-      it('');
+      afterEach(function () {
+        Task.collection.splice(0, Task.collection.length);
+      });
+
+      it('exists on Task as a function', function () {
+        expect(Task).to.have.property('add');
+        expect(Task.add).to.be.a('function');
+        expect(Task.add.length).to.be(1);
+      });
+
+      it('throws an error if argument is not a Task', function () {
+        var f = function () {
+          Task.add(true);
+        };
+        expect(f).to.throwError();
+        f = function () {
+          Task.add(new Task('read', 'test', function (d) { d(); }));
+        };
+        expect(f).to.not.throwError();
+      });
+
+      it('adds a Task instance to the Task collection', function () {
+        expect(Task.collection.length).to.be(0);
+        Task.add(new Task('read', 'test', function (d) { d(); }));
+        expect(Task.collection.length).to.be(1);
+      });
     });
 
     describe('#filter()', function () {
-      it('');
+      afterEach(function () {
+        Task.collection.splice(0, Task.collection.length);
+      });
+
+      it('exists on Task as a function', function () {
+        expect(Task).to.have.property('filter');
+        expect(Task.filter).to.be.a('function');
+        expect(Task.filter.length).to.be(1);
+      });
+
+      it('throws an error if argument is not an array', function () {
+        var f = function () {
+          Task.filter('string');
+        };
+        expect(f).to.throwError();
+        f = function () {
+          Task.filter(['array']);
+        };
+        expect(f).to.not.throwError();
+      });
+
+      it('returns an array of Task instances', function () {
+        var result;
+        voyager.task('read', 'test', function (d) { d(); });
+        result = Task.filter(['test']);
+        expect(result).to.be.ok();
+        expect(result).to.be.an('array');
+        expect(result.length).to.be(1);
+        expect(result[0] instanceof Task).to.be(true);
+      });
+
+      it('sorts the returned array', function () {
+        var result;
+        voyager.task('write', 'test', function (d) { d(); });
+        voyager.task('read', 'test', function (d) { d(); });
+        result = Task.filter(['test']);
+        expect(Task.collection.length).to.be(2);
+        expect(Task.collection[0].phase).to.be('write');
+        expect(Task.collection[1].phase).to.be('read');
+        expect(result.length).to.be(2);
+        expect(result[0].phase).to.be('read');
+        expect(result[1].phase).to.be('write');
+      });
     });
 
     describe('#find()', function () {
-      it('');
+
+      it('exists on Task as a function', function () {
+        expect(Task).to.have.property('find');
+        expect(Task.find).to.be.a('function');
+        expect(Task.find.length).to.be(2);
+      });
+
+      it('returns -1 for an unregistered Task', function () {
+
+      });
+
+      it('returns the correct index of a registered task');
     });
 
     describe('#get()', function () {
-      it('');
+      it('exists on Task as a function');
+      it('returns an array of Task instances');
+      it('returns the proper task given the id to check and task name');
     });
 
     describe('#replace()', function () {
-      it('');
+      it('exists on Task as a function');
+      it('replaces a Task at a given index');
     });
   });
 });

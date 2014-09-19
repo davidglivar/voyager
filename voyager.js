@@ -20,7 +20,9 @@ var phases = ['read', 'write', 'build']
 
 function loadTasks() {
   var internals = fs.readdirSync(path.join(__dirname, 'tasks'))
-    , externals = null;
+    , externals = null
+    , pkgexists = fs.existsSync(path.join(CWD, 'package.json'))
+    , scopes = ['dependencies', 'devDependencies'];
 
   if (fs.exists(path.join(CWD, 'tasks'))) {
     externals = fs.readdirSync(path.join(CWD, 'tasks'));
@@ -30,21 +32,25 @@ function loadTasks() {
     require(path.join(__dirname, 'tasks', f));
   });
 
-  var pkg = JSON.parse(fs.readFileSync(path.join(CWD, 'package.json'), { encoding: 'utf8' }))
-    , scopes = ['dependencies', 'devDependencies'];
-  scopes.forEach(function (scope) {
-    if (pkg[scope]) {
-      for (var key in pkg[scope]) {
-        if (/^voyager\-/.test(key)) {
-          try {
-            require(path.join(CWD, 'node_modules', key))(voyager);
-          } catch (e) {
-            console.log(e);
+  if (!pkgexists) {
+    console.log('No package.json found, skipping.');
+  } else {
+    var pkg = JSON.parse(fs.readFileSync(path.join(CWD, 'package.json'), { encoding: 'utf8' }));
+    scopes.forEach(function (scope) {
+      if (pkg[scope]) {
+        for (var key in pkg[scope]) {
+          if (/^voyager\-/.test(key)) {
+            try {
+              require(path.join(CWD, 'node_modules', key))(voyager);
+            } catch (e) {
+              console.log(e);
+            }
           }
         }
       }
-    }
-  });
+    });
+  }
+
 
   if (externals && externals.length) {
     externals.forEach(function (f) {

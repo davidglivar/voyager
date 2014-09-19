@@ -18,50 +18,6 @@ var phases = ['read', 'write', 'build']
   , DEV = path.join(CWD, '.dev')
   , SRC = path.join(CWD, 'src');
 
-function findTask(phase, name) {
-  var i = 0
-    , l = voyager.tasks_.length;
-  for (i; i < l; i++) {
-    var t = voyager.tasks_[i];
-    if (t.phase === phase && t.name === name) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-function getTask(id, name) {
-  var i = 0
-    , l = voyager.tasks_.length
-    , tasks = [];
-  for (i; i < l; i++) {
-    var t = voyager.tasks_[i];
-    if (t[id] === name) {
-      tasks.push(t);
-    }
-  }
-  return tasks;
-}
-
-function getTasks(tasks) {
-  var queue = []
-    , i = 0
-    , l = tasks.length;
-  for (i; i < l; i++) {
-    var id = 'name';
-    if (phases.indexOf(tasks[i]) >= 0) {
-      id = 'phase';
-    }
-    queue = queue.concat(getTask(id, tasks[i]));
-  }
-  return queue.sort(function (a, b) {
-    if (phases.indexOf(a.phase) < phases.indexOf(b.phase)) {
-      return -1;
-    }
-    return 1;
-  });
-}
-
 function loadTasks() {
   var internals = fs.readdirSync(path.join(__dirname, 'tasks'))
     , externals = null;
@@ -93,13 +49,15 @@ function loadTasks() {
   }
 }
 
+function watch() {
+  Watch.collection.forEach(function (w) {
+    w.start();
+  });
+}
+
 var voyager = {
-
-  tasks_: []
-
-, watches_: []
-
-, build: function () {
+  
+  build: function () {
     return this.clean()
       .then(this.run.bind(this, phases));
   }
@@ -110,10 +68,10 @@ var voyager = {
     });
   }
 
-, run: function (tasks) {
+, run: function (ids) {
     loadTasks();
-    tasks = Array.isArray(tasks) ? tasks : [tasks];
-    var queue = getTasks(tasks);
+    ids = Array.isArray(ids) ? ids : [ids];
+    var queue = Task.filter(ids);
     return queue.reduce(function (a, b) {
       return a.then(b.func());
     }, Promise.resolve());
@@ -126,21 +84,29 @@ var voyager = {
         http.createServer(ecstatic({ root: DEV })).listen(PORT);
         console.log(('\n\tListening on port ' + PORT + '\n').cyan);
         return Promise.resolve();
-      });
+      })
+      .then(watch);
   }
 
 , task: function (phase, name, func) {
     var task = new Task(phase, name, func)
-      , idx = findTask(phase, name);
+      , idx = Task.find(phase, name);
     if (idx < 0) {
-      this.tasks_.push(task);
+      Task.add(task);
     } else {
-      this.tasks_.splice(idx, 1, task);
+      Task.replace(idx, task);
     }
     return true;
   }
 
-, watch: function () {}
+, watch: function (patterns, ids) {
+    var existing = Watch.find(patterns);
+    if (existing) {
+      existing.add(ids);
+    } else {
+      Watch.add(new Watch(patterns, ids));
+    }
+  }
 
 };
 

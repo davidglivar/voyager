@@ -149,4 +149,31 @@ describe('Task', function () {
       });
     });
   });
+
+  describe('static members', function () {
+
+    describe('collection', function () {
+      it('');
+    });
+
+    describe('#add()', function () {
+      it('');
+    });
+
+    describe('#filter()', function () {
+      it('');
+    });
+
+    describe('#find()', function () {
+      it('');
+    });
+
+    describe('#get()', function () {
+      it('');
+    });
+
+    describe('#replace()', function () {
+      it('');
+    });
+  });
 });

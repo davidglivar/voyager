@@ -18,8 +18,6 @@ describe('voyager', function () {
     , 'task'
     , 'start'
     , 'watch'
-    , 'tasks_'
-    , 'watches_'
     );
   });
 
@@ -112,7 +110,7 @@ describe('voyager', function () {
 
   describe('#task()', function () {
     afterEach(function () {
-      voyager.tasks_ = [];
+      Task.collection.splice(0, Task.collection.length);
     });
 
     it('exists within voyager as a function', function () {
@@ -121,20 +119,20 @@ describe('voyager', function () {
       expect(voyager.task.length).to.be(3);
     });
 
-    it('adds a Task instance to the tasks_ array', function () {
-      expect(voyager.tasks_.length).to.be(0);
+    it('adds a Task instance to the tasks array', function () {
+      expect(Task.collection.length).to.be(0);
       voyager.task('read', 'test', function (done) { done(); });
-      expect(voyager.tasks_.length).to.be(1);
-      expect(voyager.tasks_[0] instanceof Task).to.be(true);
+      expect(Task.collection.length).to.be(1);
+      expect(Task.collection[0] instanceof Task).to.be(true);
     });
 
     it('replaces an existing task with the same name and phase', function () {
-      expect(voyager.tasks_.length).to.be(0);
+      expect(Task.collection.length).to.be(0);
       voyager.task('read', 'test', function (done) { done(); });
-      expect(voyager.tasks_.length).to.be(1);
+      expect(Task.collection.length).to.be(1);
       voyager.task('read', 'test', function (done) { done(); });
-      expect(voyager.tasks_.length).to.not.be(2);
-      expect(voyager.tasks_.length).to.be(1);
+      expect(Task.collection.length).to.not.be(2);
+      expect(Task.collection.length).to.be(1);
     });
   });
 

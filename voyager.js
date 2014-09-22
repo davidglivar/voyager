@@ -72,7 +72,7 @@ var voyager = {
   
   /**
    * Runs all phases of the build cycle
-   * @member
+   * @method
    * @public
    * @returns Promise
    */
@@ -92,7 +92,7 @@ var voyager = {
 
   /**
    * Removes both the dev staging directory and build directory
-   * @member
+   * @method
    * @public
    * @returns Promise
    */
@@ -104,7 +104,7 @@ var voyager = {
 
   /**
    * Executes a list of given tasks, sequentially
-   * @member
+   * @method
    * @public
    * @param {Array} ids - The tasks/phase identifiers
    * @returns Promise
@@ -123,7 +123,7 @@ var voyager = {
   /**
    * Runs the staging phases (read, write), starts a static server, and calls
    * any registered watch tasks.
-   * @member
+   * @method
    * @public
    */
 , start: function () {
@@ -139,7 +139,7 @@ var voyager = {
 
   /**
    * Registers a task given a phase, name, and function
-   * @member
+   * @method
    * @public
    * @param {string} phase - Possible values: 'read', 'write', 'build'
    * @param {string} name - Unique identifier for this task
@@ -159,7 +159,7 @@ var voyager = {
 
   /**
    * Registers a group of tasks to a set of patterns
-   * @member
+   * @method
    * @public
    * @param {Array} patterns - The patterns (globs) to register against
    * @param {Array} ids - The tasks/phases to run agains given patterns
@@ -177,7 +177,7 @@ var voyager = {
 };
 
 /**
- * Expose constants
+ * Expose constants (immutable)
  */
 Object.defineProperties(voyager, {
   CWD: { value: CWD }

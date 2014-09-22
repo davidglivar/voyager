@@ -1,34 +1,30 @@
 var voyager = require('../voyager');
 
-voyager.task('artifacts-prebuild', ['artifacts', 'prebuild'], function (done) {
-  this.in.src([
+voyager.task('write', 'artifacts', function (done) {
+  this.src([
       'favicon.ico'
     , 'humans.txt'
     , 'robots.txt'
     , 'apple-touch-icon-precomposed.png'
     ])
-    .pipe(this.out.dev())
+    .pipe(this.out())
     .on('end', done);
 });
 
-voyager.task('artifacts-build', ['artifacts', 'build'], function (done) {
-  this.in.dev([
+voyager.task('build', 'artifacts', function (done) {
+  this.src([
       'favicon.ico'
     , 'humans.txt'
     , 'robots.txt'
     , 'apple-touch-icon-precomposed.png'
     ])
-    .pipe(this.out.bld())
+    .pipe(this.out())
     .on('end', done);
 });
 
-voyager.task('artifacts-watch', 'watch', function () {
-  this.watch([
+voyager.watch([
       'favicon.ico'
     , 'humans.txt'
     , 'robots.txt'
     , 'apple-touch-icon-precomposed.png'
-    ]
-  , 'artifacts-prebuild'
-  );
-});
+  ], 'artifacts');

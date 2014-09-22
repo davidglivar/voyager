@@ -1,17 +1,15 @@
 var voyager = require('../voyager');
 
-voyager.task('fonts-prebuild', ['fonts', 'prebuild'], function (done) {
-  this.in.src('fonts/*')
-    .pipe(this.out.dev('fonts'))
+voyager.task('write', 'fonts', function (done) {
+  this.src('fonts/*')
+    .pipe(this.out('fonts'))
     .on('end', done);
 });
 
-voyager.task('fonts-build', ['fonts', 'build'], function (done) {
-  this.in.dev('fonts/*')
-    .pipe(this.out.bld('fonts'))
+voyager.task('build', 'fonts', function (done) {
+  this.src('fonts/*')
+    .pipe(this.out('fonts'))
     .on('end', done);
 });
 
-voyager.task('fonts-watch', 'watch', function () {
-  this.watch('fonts/*', 'fonts-prebuild');
-});
+voyager.watch('fonts/*', 'fonts');

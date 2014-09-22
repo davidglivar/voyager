@@ -3,8 +3,8 @@ VOYAGER (alpha)
 
 [![wercker status](https://app.wercker.com/status/a6a9346cd1fa1d24d19799d710ddab22/m "wercker status")](https://app.wercker.com/project/bykey/a6a9346cd1fa1d24d19799d710ddab22)
 
-Voyager is a static site generator with a built-in task runner. It seamlessly
-works with all [gulp plugins](http://gulpjs.com/plugins/) for ease of use. Voyager
+Voyager is a static site generator with a built-in task runner. It works seamlessly
+with all [gulp plugins](http://gulpjs.com/plugins/) for ease of use. Voyager
 is not a [gulp](http://gulpjs.com/) or [grunt](http://gruntjs.com/) replacement.
 However, if you are in need of building a frontend website with all the heavy
 build boilerplate taken care of for you, then voyager is for you.
@@ -57,12 +57,12 @@ in my next project – after doing the above setup, do the following:
 
     $ npm i voyager-browserify voyager-jshint --save-dev
 
-Restart your server and you know what browserify and jshint tasks running.
+Restart your server and you now have browserify and jshint tasks running.
 
 Commands
 --------
 
-The voyager-generator package creates some startup commands for you when you create a 
+The [voyager-generator](https://github.com/davidglivar/voyager-generator) package creates some startup commands for you when you create a 
 new project. Within your project directory run `npm start` to run the 'read' and
 'write' phases, start your static webserver, and begin watching files for changes.
 To build the final output, run `npm run build`. This runs all build phases - 'read',

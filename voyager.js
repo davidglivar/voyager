@@ -64,8 +64,18 @@ function watch() {
   });
 }
 
+/**
+ * @namespace
+ * @exports
+ */
 var voyager = {
   
+  /**
+   * Runs all phases of the build cycle
+   * @member
+   * @public
+   * @returns Promise
+   */
   build: function () {
     return this.clean()
       .then(this.run.bind(this, phases));
@@ -80,12 +90,25 @@ var voyager = {
     }
   }
 
+  /**
+   * Removes both the dev staging directory and build directory
+   * @member
+   * @public
+   * @returns Promise
+   */
 , clean: function () {
     return new Promise(function (done, fail) {
       del([DEV, BLD], done);
     });
   }
 
+  /**
+   * Executes a list of given tasks, sequentially
+   * @member
+   * @public
+   * @param {Array} ids - The tasks/phase identifiers
+   * @returns Promise
+   */
 , run: function (ids) {
     loadTasks();
     ids = Array.isArray(ids) ? ids : [ids];
@@ -97,6 +120,12 @@ var voyager = {
     }, Promise.resolve());
   }
 
+  /**
+   * Runs the staging phases (read, write), starts a static server, and calls
+   * any registered watch tasks.
+   * @member
+   * @public
+   */
 , start: function () {
     this.clean()
       .then(this.run.bind(this, ['read', 'write']))
@@ -108,6 +137,15 @@ var voyager = {
       .then(watch);
   }
 
+  /**
+   * Registers a task given a phase, name, and function
+   * @member
+   * @public
+   * @param {string} phase - Possible values: 'read', 'write', 'build'
+   * @param {string} name - Unique identifier for this task
+   * @param {Function} func - The function to execute
+   * @returns {boolean}
+   */
 , task: function (phase, name, func) {
     var task = new Task(phase, name, func)
       , idx = Task.find(phase, name);
@@ -119,6 +157,13 @@ var voyager = {
     return true;
   }
 
+  /**
+   * Registers a group of tasks to a set of patterns
+   * @member
+   * @public
+   * @param {Array} patterns - The patterns (globs) to register against
+   * @param {Array} ids - The tasks/phases to run agains given patterns
+   */
 , watch: function (patterns, ids) {
     patterns = Array.isArray(patterns) ? patterns : [patterns];
     var existing = Watch.find(patterns);
@@ -131,6 +176,9 @@ var voyager = {
 
 };
 
+/**
+ * Expose constants
+ */
 Object.defineProperties(voyager, {
   CWD: { value: CWD }
 , BLD: { value: BLD }

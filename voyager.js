@@ -24,7 +24,7 @@ function loadTasks() {
     , pkgexists = fs.existsSync(path.join(CWD, 'package.json'))
     , scopes = ['dependencies', 'devDependencies'];
 
-  if (fs.exists(path.join(CWD, 'tasks'))) {
+  if (fs.existsSync(path.join(CWD, 'tasks'))) {
     externals = fs.readdirSync(path.join(CWD, 'tasks'));
   }
 

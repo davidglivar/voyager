@@ -5,7 +5,7 @@
   "main": "voyager.js",
   "scripts": {
     "test": "ENV=test ./node_modules/.bin/mocha -R spec",
-    "watch": "ENV=test ./node_modules/.bin/mocha -R list -w"
+    "watch": "ENV=test ./node_modules/.bin/mocha -R min -w"
   },
   "author": "David Glivar <davidglivar@gmail.com>",
   "license": "ISC",

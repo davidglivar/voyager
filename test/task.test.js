@@ -201,17 +201,6 @@ describe('Task', function () {
         expect(Task.filter.length).to.be(1);
       });
 
-      it('throws an error if argument is not an array', function () {
-        var f = function () {
-          Task.filter('string');
-        };
-        expect(f).to.throwError();
-        f = function () {
-          Task.filter(['array']);
-        };
-        expect(f).to.not.throwError();
-      });
-
       it('returns an array of Task instances', function () {
         var result;
         voyager.task('read', 'test', function (d) { d(); });

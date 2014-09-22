@@ -51,7 +51,6 @@ function loadTasks() {
     });
   }
 
-
   if (externals && externals.length) {
     externals.forEach(function (f) {
       require(path.join(CWD, 'tasks', f));
@@ -92,7 +91,9 @@ var voyager = {
     ids = Array.isArray(ids) ? ids : [ids];
     var queue = Task.filter(ids);
     return queue.reduce(function (a, b) {
-      return a.then(b.func());
+      return a.then(function () {
+        return b.func.call(b);
+      });
     }, Promise.resolve());
   }
 
@@ -119,6 +120,7 @@ var voyager = {
   }
 
 , watch: function (patterns, ids) {
+    patterns = Array.isArray(patterns) ? patterns : [patterns];
     var existing = Watch.find(patterns);
     if (existing) {
       existing.add(ids);

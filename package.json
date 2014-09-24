@@ -1,6 +1,6 @@
 {
   "name": "voyager",
-  "version": "0.4.0",
+  "version": "0.4.01",
   "description": "A STATIC SITE GENERATOR FROM THE EDGE OF THE SOLAR SYSTEM.",
   "main": "voyager.js",
   "scripts": {

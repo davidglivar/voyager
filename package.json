@@ -2,16 +2,22 @@
   "name": "voyager",
   "version": "0.4.11",
   "description": "A STATIC SITE GENERATOR FROM THE EDGE OF THE SOLAR SYSTEM.",
+  "keywords": [
+  ],
+  "homepage": "https://github.com/wieden-kennedy/voyager",
   "main": "voyager.js",
+  "bugs": {
+    "url": "https://github.com/wieden-kennedy/voyager/issues"
+  },
   "scripts": {
     "test": "ENV=test ./node_modules/.bin/mocha -R spec",
     "watch": "ENV=test ./node_modules/.bin/mocha -R min -w"
   },
   "author": "David Glivar <davidglivar@gmail.com>",
-  "license": "ISC",
+  "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "git@github.com:davidglivar/voyager.git"
+    "url": "git@github.com:wieden-kennedy/voyager.git"
   },
   "dependencies": {
     "colors": "^0.6.2",

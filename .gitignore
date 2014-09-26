@@ -4,3 +4,4 @@ sandbox
 .dev
 build
 *.log
+.idea

@@ -53,7 +53,12 @@ function loadTasks() {
 
   if (externals && externals.length) {
     externals.forEach(function (f) {
-      require(path.join(CWD, 'tasks', f));
+      var fpath = path.join(CWD, 'tasks', f);
+      if (!fs.lstatSync(fpath).isDirectory()) {
+        try {
+          require(fpath);
+        } catch (e) { console.log(e.stack); }
+      }
     });
   }
 }
